@@ -16,6 +16,19 @@ class AddPage extends ConsumerWidget {
             Navigator.pop(context); // ボタンをタップした時、元の画面に戻る
           },
         ),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              // 保存のロジックをここに記述
+            },
+            child: const Text(
+              '保存',
+              style: TextStyle(
+                color: Colors.white, // アプリバーの色に合わせて文字色を白に設定
+              ),
+            ),
+          ),
+        ],
       ),
       body: Center(
         child: Column(
@@ -25,7 +38,7 @@ class AddPage extends ConsumerWidget {
                 labelText: ('タイトルを入力してください'),
               ),
             ),
-            
+
             TextField(
               decoration: InputDecoration(
                 labelText: ('コメントを入力してください'),
