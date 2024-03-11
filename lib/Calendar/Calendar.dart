@@ -59,15 +59,40 @@ for (int i = 1; i <= lastDay; i++) {
     textColor = Colors.red;
   }
 
-  dayWidgets.add(Container(
-    padding: const EdgeInsets.all(4.0),
-    child: Text(
-      '$i',
-      textAlign: TextAlign.center,
-      style: TextStyle(color: textColor),
-    ),
-  ));
-}
+ dayWidgets.add(GestureDetector(
+      onTap: () {
+        showDialog(
+          context: context,
+          builder: (BuildContext context) {
+            return AlertDialog(
+              title: Text("選択された日付"),
+              content: Container(
+                width: 400,
+                height: 500,
+                child: Text('メッセージ'),
+              ),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('閉じる'),
+                  onPressed: () {
+                    Navigator.of(context).pop();
+                  },
+                ),
+              ],
+            );
+          },
+        );
+      },
+      child: Container(
+        padding: const EdgeInsets.all(4.0),
+        child: Text(
+          '$i',
+          textAlign: TextAlign.center,
+          style: TextStyle(color: textColor),
+        ),
+      ),
+    ));
+  }
       return dayWidgets;
     }
 
