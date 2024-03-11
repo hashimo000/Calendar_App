@@ -25,6 +25,12 @@ class AddPage extends ConsumerWidget {
                 labelText: ('タイトルを入力してください'),
               ),
             ),
+            
+            TextField(
+              decoration: InputDecoration(
+                labelText: ('コメントを入力してください'),
+              ),
+            ),
           ],
         )
       ),
