@@ -16,6 +16,8 @@ dependencies:
 
   cupertino_icons: ^1.0.6
   flutter_riverpod: ^2.5.1
+ 
+  flutter_datetime_picker_plus: ^2.1.0
 
 dev_dependencies:
   flutter_test:

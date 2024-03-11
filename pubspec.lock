@@ -62,6 +62,14 @@ packages:
     description: flutter
     source: sdk
     version: "0.0.0"
+  flutter_datetime_picker_plus:
+    dependency: "direct main"
+    description:
+      name: flutter_datetime_picker_plus
+      sha256: "3b2ebcd7b4d2c253171dc6ba78a850af7dcb68fd965b9133dd254ff662a9023b"
+      url: "https://pub.dev"
+    source: hosted
+    version: "2.1.0"
   flutter_lints:
     dependency: "direct dev"
     description:
@@ -242,4 +250,4 @@ packages:
     version: "13.0.0"
 sdks:
   dart: ">=3.3.0 <4.0.0"
-  flutter: ">=3.0.0"
+  flutter: ">=3.10.0"
