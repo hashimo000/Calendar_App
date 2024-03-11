@@ -1,10 +1,10 @@
 import 'package:flutter/material.dart';
-
-class AddPage extends StatelessWidget {
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+class AddPage extends ConsumerWidget {
   const AddPage({Key? key}) : super(key: key);
 
   @override
-  Widget build(BuildContext context) {
+  Widget build(BuildContext context, WidgetRef ref) {
     return const Scaffold(
       
       body: Center(
