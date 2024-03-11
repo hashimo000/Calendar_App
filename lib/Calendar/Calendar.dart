@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:calendar/Calendar/holiday.dart';
-
+import 'package:calendar/Calendar/addPage.dart';
 class CalendarView extends ConsumerWidget {
   const CalendarView({Key? key}) : super(key: key);
 
@@ -65,7 +65,24 @@ for (int i = 1; i <= lastDay; i++) {
           context: context,
           builder: (BuildContext context) {
             return AlertDialog(
-              title: Text("選択された日付"),
+              title: Container(
+                child: Row(
+                  children: [
+                    Text(dateString),
+                    FloatingActionButton(
+                      child: Icon(Icons.add),
+                      onPressed: 
+                      (){
+                        Navigator.of(context).push(
+                          MaterialPageRoute(builder: (context) {
+                            return AddPage();
+                          }),
+                        );
+                      }
+                      )
+                  ],),
+              ),
+
               content: Container(
                 width: 400,
                 height: 500,
