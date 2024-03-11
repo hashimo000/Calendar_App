@@ -2,11 +2,14 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:calendar/Calendar/holiday.dart';
+
+
 class CalendarPage extends ConsumerWidget {
   const CalendarPage({Key? key}) : super(key: key);
   
   @override
   Widget build(BuildContext context, WidgetRef ref) {
+
     // 現在の日付を取得
     DateTime now = DateTime.now();
     // 月の最初の日を取得,当然１だけど
