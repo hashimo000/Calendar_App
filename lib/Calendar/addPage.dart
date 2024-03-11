@@ -18,7 +18,15 @@ class AddPage extends ConsumerWidget {
         ),
       ),
       body: Center(
-        child: Text('Add Pageです。'),
+        child: Column(
+          children: const <Widget>[
+            TextField(
+              decoration: InputDecoration(
+                labelText: ('タイトルを入力してください'),
+              ),
+            ),
+          ],
+        )
       ),
     );
   }
