@@ -8,9 +8,15 @@ void main() {
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
-  @override
-  Widget build(BuildContext context) {
-    return MaterialApp(
-      home:  CalendarPage(),
-    );
-  }}
+ @override
+Widget build(BuildContext context) {
+  return MaterialApp(
+    home: Scaffold(
+      appBar: AppBar(
+        title: Text('カレンダービュー'),
+        backgroundColor: Colors.blueAccent,
+      ),
+      body: CalendarView(),
+    ),
+  );
+}}

@@ -3,28 +3,36 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:calendar/Calendar/holiday.dart';
 
+class CalendarView extends ConsumerWidget {
+  const CalendarView({Key? key}) : super(key: key);
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    return PageView.builder(
+      itemCount: 10000, // 必要に応じて適切な数値を設定
+      controller: PageController(initialPage: 5000),
+      itemBuilder: (context, index) {
+        DateTime now = DateTime.now();
+        DateTime firstOfMonth = DateTime(now.year, now.month + index - 5000, 1);
+        return CalendarPage(key: ValueKey(firstOfMonth), firstDayOfMonth: firstOfMonth);
+      },
+    );
+  }
+}
 
 class CalendarPage extends ConsumerWidget {
-  const CalendarPage({Key? key}) : super(key: key);
-  
+  final DateTime firstDayOfMonth;
+  const CalendarPage({Key? key, required this.firstDayOfMonth}) : super(key: key);
+
   @override
   Widget build(BuildContext context, WidgetRef ref) {
 
-    // 現在の日付を取得
-    DateTime now = DateTime.now();
-    // 月の最初の日を取得,当然１だけど
-    DateTime firstDayOfMonth = DateTime(now.year, now.month, 1);
-    // その月の最終日の数を取得
-    int lastDay = DateTime(now.year, now.month + 1, 1).add(Duration(days: -1)).day;
-    debugPrint((lastDay).toString());
-   
-    // 月の最終日を取得
-    DateTime lastDayOfMonth = DateTime(now.year, now.month, lastDay);
     List<String> weekDay = ["月", "火", "水", "木", "金", "土", "日"];
 
-    // 月の最初の日が何曜日かを取得します (1: 月曜日, 7: 日曜日)
+    // 月の最初の日が何曜日かを取得(1: 月曜日, 7: 日曜日)
     int weekDayOfFirstDay = firstDayOfMonth.weekday;
-   
+    int lastDay = DateTime(firstDayOfMonth.year, firstDayOfMonth.month + 1, 0).day;
+
     // カレンダーの日付ウィジェットを生成
     List<Widget> getDayWidgets() {
       List<Widget> dayWidgets = [];
@@ -35,7 +43,7 @@ class CalendarPage extends ConsumerWidget {
       }
       // 1日から月の最終日までの日付を追加
 for (int i = 1; i <= lastDay; i++) {
-  DateTime date = DateTime(now.year, now.month, i);
+  DateTime date = DateTime(firstDayOfMonth.year, firstDayOfMonth.month, i);
   String dateString = DateFormat('yyyy-MM-dd').format(date);
   Color textColor = Colors.black; // デフォルトのテキスト色
 
@@ -60,17 +68,11 @@ for (int i = 1; i <= lastDay; i++) {
     ),
   ));
 }
-
-     
-
       return dayWidgets;
     }
 
     return Scaffold(
-      appBar: AppBar(
-        title: Text('カレンダー'),
-        backgroundColor: Colors.blue,
-      ),
+
       body: Column(
         children: [
           Align(
@@ -78,7 +80,7 @@ for (int i = 1; i <= lastDay; i++) {
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
               child: Text(
-                DateFormat("yyyy年MM月").format(now),
+                DateFormat("yyyy年MM月").format(firstDayOfMonth),
                 style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
               ),
             ),
