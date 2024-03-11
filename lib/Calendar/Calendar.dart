@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
+import 'package:calendar/Calendar/holiday.dart';
 class CalendarPage extends ConsumerWidget {
   const CalendarPage({Key? key}) : super(key: key);
   
@@ -41,7 +42,11 @@ for (int i = 1; i <= lastDay; i++) {
   } else if (date.weekday == DateTime.saturday) {
     textColor = Colors.blue;
   }
-
+  
+  // 祝日データがあれば赤色にする
+  if (holidayData.containsKey(dateString)) {
+    textColor = Colors.red;
+  }
 
   dayWidgets.add(Container(
     padding: const EdgeInsets.all(4.0),
