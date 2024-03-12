@@ -91,14 +91,21 @@ for (int i = 1; i <= lastDay; i++) {
                  final title = ref.watch(eventTitleProvider);
                 final dateTimeStart = ref.watch(eventDateTimeStartProvider);
                 final dateTimeEnd = ref.watch(eventDateTimeEndProvider);
+                final isAllDay = ref.watch(allDayEventProvider);
+
                 //時間を無視して日付のみを取得、これで初日も反映される
                 DateTime dateOnlyTimeStart = DateTime(dateTimeStart.year, dateTimeStart.month, dateTimeStart.day);
                 // イベント日かどうかの判定
                bool isEventDay = ((dateTimeStart.isBefore(date) && dateTimeEnd.isAfter(date)) || date.isAtSameMomentAs(dateOnlyTimeStart));
                // 条件に応じたテキストの表示
-               String displayText = isEventDay ? 'タイトル: $title\n日時: ${DateFormat('yyyy/MM/dd').format(dateTimeStart)} - ${DateFormat('yyyy/MM/dd').format(dateTimeEnd)}' : '予定がありません';
+             String displayText;
+            if (isAllDay) {
+              displayText = isEventDay ? ("終日|タイトル:   "+title) : '予定がありません';
+            } else {
+              displayText = isEventDay ? 'タイトル: $title\n日時: ${DateFormat('yyyy/MM/dd').format(dateTimeStart)} - ${DateFormat('yyyy/MM/dd').format(dateTimeEnd)}' : '予定がありません';
+            }
 
-                return Text(displayText, style: TextStyle(fontSize: 20));
+            return Text(displayText, style: TextStyle(fontSize: 20));
                  },
                 )
               ),
