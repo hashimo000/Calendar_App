@@ -6,6 +6,12 @@ import 'package:intl/intl.dart';
 final dateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final dateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final allDayEventProvider = StateProvider<bool>((ref) => false); 
+// イベントタイトルと日時を保持するプロバイダー
+final eventTitleProvider = StateProvider<String>((ref) => '');
+final eventDateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
+final eventDateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now());
+final TextEditingController _titleController = TextEditingController();
+
 class AddPage extends ConsumerWidget {
   const AddPage({Key? key,}) : super(key: key);
   
@@ -89,7 +95,14 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              // 保存のロジックをここに記述
+              String enteredTitle = _titleController.text;
+               DateTime startDateTime = ref.read(dateTimeStartProvider);
+               DateTime endDateTime = ref.read(dateTimeEndProvider);
+              // ここに保存のロジックを記述
+    ref.read(eventTitleProvider.notifier).state = enteredTitle;// TextFieldから入力されたタイトル;
+    ref.read(eventDateTimeStartProvider.notifier).state = startDateTime; // DateTimePickerから選択された日時;
+    ref.read(eventDateTimeEndProvider.notifier).state = endDateTime;
+    Navigator.pop(context); // ポップアップを閉じる
             },
             child: const 
             Text('保存',
@@ -104,6 +117,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
         child: Column(
           children:  <Widget>[
             TextField(
+               controller: _titleController,
               decoration: InputDecoration(
                 labelText: ('タイトルを入力してください'),
               ),

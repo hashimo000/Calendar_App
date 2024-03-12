@@ -86,7 +86,14 @@ for (int i = 1; i <= lastDay; i++) {
               content: Container(
                 width: 400,
                 height: 500,
-                child: Text('メッセージ'),
+                child: Consumer(
+                  builder: (context, ref, child) {
+                 final title = ref.watch(eventTitleProvider);
+                final dateTimeStart = ref.watch(eventDateTimeStartProvider);
+                final dateTimeEnd = ref.watch(eventDateTimeEndProvider);
+                return Text('タイトル: $title\n日時: ${DateFormat('yyyy/MM/dd ').format(dateTimeStart)}+${DateFormat('yyyy/MM/dd ').format(dateTimeEnd)}');
+    },
+                )
               ),
               actions: <Widget>[
                 TextButton(
