@@ -7,7 +7,8 @@ final dateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final dateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now());
 
 class AddPage extends ConsumerWidget {
-  const AddPage({Key? key}) : super(key: key);
+  const AddPage({Key? key,}) : super(key: key);
+  
 void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
   DatePicker.showDateTimePicker(
     context,
@@ -68,14 +69,26 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
                 labelText: ('タイトルを入力してください'),
               ),
             ),
+            SwitchListTile(
+              title: Text('終日'),
+              value: false,
+              onChanged: (bool value) {},
+      secondary: const Icon(Icons.lightbulb_outline),
+            ),
             
             GestureDetector(
                   onTap: () => _showDateTimePickerStart(context, ref),
                   child: Consumer(
                   builder: (context, ref, child) {
                   final selectedDate = ref.watch(dateTimeStartProvider);
-                
-                 return Text("開始"+DateFormat('yyyy-MM-dd - kk:mm').format(selectedDate));
+                 return Container(
+        padding: EdgeInsets.all(8.0), // テキスト周りのパディングを8.0に設定
+        decoration: BoxDecoration(
+          border: Border.all(color: Colors.blueAccent), // 青色の枠線を設定
+          borderRadius: BorderRadius.circular(4.0), // 角丸の枠にする場合は BorderRadius を設定
+        ),
+                  child:Text("開始"+DateFormat('yyyy-MM-dd kk:mm').format(selectedDate))
+                 );
                 },
                ),
               ),
@@ -85,7 +98,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
                   builder: (context, ref, child) {
                   final selectedDate = ref.watch(dateTimeEndProvider);
                  
-                 return Text("終了"+DateFormat('yyyy-MM-dd - kk:mm').format(selectedDate));
+                 return Text("終了"+DateFormat('yyyy-MM-dd kk:mm').format(selectedDate));
                 },
                ),
               ),
