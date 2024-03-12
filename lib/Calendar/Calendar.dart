@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:calendar/Calendar/holiday.dart';
 import 'package:calendar/Calendar/addPage.dart';
+import 'package:calendar/Calendar/editPage.dart';
 class CalendarView extends ConsumerWidget {
   const CalendarView({Key? key}) : super(key: key);
 
@@ -82,7 +83,7 @@ for (int i = 1; i <= lastDay; i++) {
                       )
                   ],),
               ),
-
+              
               content: Container(
                 width: 400,
                 height: 500,
@@ -105,7 +106,17 @@ for (int i = 1; i <= lastDay; i++) {
               displayText = isEventDay ? 'タイトル: $title\n日時: ${DateFormat('yyyy/MM/dd').format(dateTimeStart)} - ${DateFormat('yyyy/MM/dd').format(dateTimeEnd)}' : '予定がありません';
             }
 
-            return Text(displayText, style: TextStyle(fontSize: 20));
+            return GestureDetector(
+                onTap: () {
+                   Navigator.of(context).push(
+                   MaterialPageRoute(builder: (context) => EditPage()),
+                    );
+                   },
+                 child: Text(
+                 displayText, // イベントの詳細を表示
+                 style: TextStyle(fontSize: 20),
+                   ),
+                  );
                  },
                 )
               ),
