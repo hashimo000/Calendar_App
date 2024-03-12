@@ -140,10 +140,13 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
                ),
               ),
 
-            TextField(
+           TextField(
+              keyboardType: TextInputType.multiline,
+              maxLines: 6,
               decoration: InputDecoration(
-                labelText: ('コメントを入力してください'),
-              ),
+              labelText: 'コメントを入力してください',
+              border: OutlineInputBorder(), // 枠線を追加して入力フィールドをはっきりさせる
+             ),
             ),
           ],
         )
