@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';//datetimepickerの最新バージョンインポート
 import 'package:intl/intl.dart';
-
 final dateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final dateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final allDayEventProvider = StateProvider<bool>((ref) => false); 
