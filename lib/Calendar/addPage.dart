@@ -10,7 +10,9 @@ final allDayEventProvider = StateProvider<bool>((ref) => false);
 final eventTitleProvider = StateProvider<String>((ref) => '');
 final eventDateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final eventDateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now());
+final eventCommentsProvider = StateProvider<String>((ref) => '');
 final TextEditingController _titleController = TextEditingController();
+final TextEditingController _commentsController = TextEditingController();
 
 class AddPage extends ConsumerWidget {
   const AddPage({Key? key,}) : super(key: key);
@@ -96,10 +98,12 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
           TextButton(
             onPressed: () {
               String enteredTitle = _titleController.text;
+              String enteredComments = _commentsController.text; 
                DateTime startDateTime = ref.read(dateTimeStartProvider);
                DateTime endDateTime = ref.read(dateTimeEndProvider);
               // ここに保存のロジックを記述
     ref.read(eventTitleProvider.notifier).state = enteredTitle;// TextFieldから入力されたタイトル;
+    ref.read(eventCommentsProvider.notifier).state = enteredComments; // TextFieldから入力されたコメント;
     ref.read(eventDateTimeStartProvider.notifier).state = startDateTime; // DateTimePickerから選択された日時;
     ref.read(eventDateTimeEndProvider.notifier).state = endDateTime;
     Navigator.pop(context); // ポップアップを閉じる
@@ -155,6 +159,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
               ),
 
            TextField(
+             controller: _commentsController, 
               keyboardType: TextInputType.multiline,
               maxLines: 6,
               decoration: InputDecoration(
