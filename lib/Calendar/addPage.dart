@@ -12,6 +12,23 @@ final eventDateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now()
 final eventCommentsProvider = StateProvider<String>((ref) => '');
 final TextEditingController _titleController = TextEditingController();
 final TextEditingController _commentsController = TextEditingController();
+final eventListProvider = StateProvider<List<Event>>((ref) => []);
+
+class Event {
+  String title;
+  DateTime startDateTime;
+  DateTime endDateTime;
+  String comments;
+  bool isAllDay;
+
+  Event({
+    required this.title,
+    required this.startDateTime,
+    required this.endDateTime,
+    this.comments = '',
+    this.isAllDay = false,
+  });
+}
 
 class AddPage extends ConsumerWidget {
   const AddPage({Key? key,}) : super(key: key);
@@ -96,6 +113,20 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
         actions: <Widget>[
           TextButton(
             onPressed: () {
+             // 新しいイベントを作成
+             Event newEvent = Event(
+                   title: _titleController.text,
+                   startDateTime: ref.read(dateTimeStartProvider),
+                   endDateTime: ref.read(dateTimeEndProvider),
+                   comments: _commentsController.text,
+                   isAllDay: ref.read(allDayEventProvider),
+                   );
+                // 現在のイベントリストに新しいイベントを追加して更新
+            ref.read(eventListProvider.notifier).update((state) => [...state, newEvent]);
+
+            // 入力フィールドをクリア
+            _titleController.clear();
+            _commentsController.clear();
               String enteredTitle = _titleController.text;
               String enteredComments = _commentsController.text; 
                DateTime startDateTime = ref.read(dateTimeStartProvider);
