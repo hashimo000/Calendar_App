@@ -63,9 +63,9 @@ for (int i = 1; i <= lastDay; i++) {
  dayWidgets.add(GestureDetector(
       onTap: () {
         showDialog(
-          context: context,
-          builder: (BuildContext context) {
-            // 保存されたイベントリストを取得
+  context: context,
+  builder: (BuildContext context) {
+    // 保存されたイベントリストを取得
     final eventList = ref.watch(eventListProvider);
     // 選択された日付に対応するイベントだけをフィルタリング
     final eventsForSelectedDay = eventList.where((event) {
@@ -74,74 +74,69 @@ for (int i = 1; i <= lastDay; i++) {
       return date.isAtSameMomentAs(startDay) || (date.isAfter(startDay) && date.isBefore(endDay)) || date.isAtSameMomentAs(endDay);
     }).toList();
 
-            return AlertDialog(
-              title: Container(
-                child: Row(
-                  children: [
-                    Text(dateString),
-                    FloatingActionButton(
-                      child: Icon(Icons.add),
-                      onPressed: 
-                      (){
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) {
-                            return AddPage();
-                          }),
-                        );
-                      }
-                      )
-                  ],),
-              ),
-              
-              content: Container(
-                width: 400,
-                height: 500,
-                child: Consumer(
-                  builder: (context, ref, child) {
-                
-                final dateTimeStart = ref.watch(eventDateTimeStartProvider);
-                final dateTimeEnd = ref.watch(eventDateTimeEndProvider);
-            return GestureDetector(
-                onTap: () {
-                   Navigator.of(context).push(
-                   MaterialPageRoute(builder: (context) => EditPage()),
-                    );
-                   },
-                 child:ListView.builder(itemCount: eventsForSelectedDay.length,
-          itemBuilder: (context, index) {
-            
-            final event = eventsForSelectedDay[index];
-            return ListTile(
-            
+    return AlertDialog(
       title: Row(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children:<Widget> [
-          event.isAllDay? Text("終日",style: TextStyle(fontSize: 20, color: textColor,fontWeight: FontWeight.bold),)
-          : Column(
-        children: <Widget>[
-          Text(DateFormat("HH:mm").format(dateTimeStart)),
-          Text(DateFormat("HH:mm").format(dateTimeEnd)),
+        children: [
+          Text(dateString),
+          FloatingActionButton(
+            child: Icon(Icons.add),
+            onPressed: (){
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => AddPage()),
+              );
+            }
+          )
         ],
       ),
-      Text(event.title,style: TextStyle(fontSize: 20, color: textColor,fontWeight: FontWeight.bold),),
-            ],
-            ),
-            );
-          },) 
-                  );
-                 },
-                )
+      content: Container(
+        width: 400,
+        height: 500,
+        child: ListView.builder(
+          itemCount: eventsForSelectedDay.length,
+          itemBuilder: (context, index) {
+            final event = eventsForSelectedDay[index];
+            return ListTile(
+              title: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  event.isAllDay ? Text("終日", style: TextStyle(fontSize: 20, color: textColor, fontWeight: FontWeight.bold)) :
+                  Column(
+                      children: <Widget>[
+                          Text(DateFormat("HH:mm").format(event.startDateTime)), // 修正点: dateTimeStartをeventのプロパティに変更
+                          Text(DateFormat("HH:mm").format(event.endDateTime)), // 修正点: dateTimeEndをeventのプロパティに変更
+                      ],
+                  ),
+                  Expanded(
+                    child: Text(event.title, style: TextStyle(fontSize: 20, color: textColor, fontWeight: FontWeight.bold)),
+                  ),
+                ],
               ),
-              actions: <Widget>[
-                TextButton(
-                  child: Text('閉じる'),
-                  onPressed: () {
-                    Navigator.of(context).pop();
-                  },
-                ),
-              ],
+              onTap: () { // ここでGestureDetectorをListTileのonTapに変更
+              debugPrint(event.id.toString());
+              debugPrint(event.title);
+              debugPrint(event.startDateTime.toString());
+              debugPrint(event.endDateTime.toString());
+              debugPrint(event.comments);
+              debugPrint(event.isAllDay.toString());
+
+                  Navigator.of(context).push(MaterialPageRoute(
+                      builder: (context) => EditPage(eventId: event.id,),
+                  ));
+              },
             );
           },
+        ),
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: Text('閉じる'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+  },
         );
       },
       child: Container(
