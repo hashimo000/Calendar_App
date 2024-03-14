@@ -13,10 +13,39 @@ import 'package:calendar/Calendar/addPage.dart';
 // final eventCommentsProvider = StateProvider<String>((ref) => '');
 final TextEditingController _titleController = TextEditingController();
 final TextEditingController _commentsController = TextEditingController();
+// Providerの定義
+final titleProvider = StateProvider<String>((ref) => '');
+final commentsProvider = StateProvider<String>((ref) => '');
 
-class EditPage extends ConsumerWidget {
-  const EditPage({Key? key,}) : super(key: key);
+class EditPage extends ConsumerStatefulWidget {
+  final int eventId;
   
+   EditPage({Key? key, required this.eventId}) : super(key: key);
+  @override
+  _EditPageState createState() => _EditPageState();
+}
+
+class _EditPageState extends ConsumerState<EditPage> {
+  final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _commentsController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      final event = ref.read(eventListProvider).where((event) => event.id == widget.eventId).first;
+      _titleController.text = event.title; // 既存のイベントタイトルを設定
+      _commentsController.text = event.comments; // 既存のイベントコメントを設定
+    });
+  }
+
+  @override
+  void dispose() {
+    _titleController.dispose();
+    _commentsController.dispose();
+    super.dispose();
+  }
+
 void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
   if (isAllDay) {
@@ -40,7 +69,7 @@ void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
       minTime: DateTime(2022, 5, 5, 0, 00),
       maxTime: DateTime(2030, 6, 7, 23, 59),
       onConfirm: (date) {
-        ref.read(dateTimeStartProvider.notifier).update((state) => date);
+         ref.read(dateTimeStartProvider.notifier).state = date;
       },
       currentTime: ref.watch(dateTimeStartProvider),
       locale: LocaleType.jp,
@@ -71,7 +100,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
       minTime: DateTime(2022, 5, 5, 0, 00),
       maxTime: DateTime(2030, 6, 7, 23, 59),
       onConfirm: (date) {
-        ref.read(dateTimeEndProvider.notifier).update((state) => date);
+        ref.read(dateTimeEndProvider.notifier).state = date;
       },
       currentTime: ref.watch(dateTimeEndProvider),
       locale: LocaleType.jp,
@@ -79,8 +108,12 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
   }
 }
 
-  @override
-  Widget build(BuildContext context, WidgetRef ref) {
+
+ @override
+  Widget build(BuildContext context) {
+    // イベントリストからeventIdに対応するイベントを検索
+    final eventId = widget.eventId;
+
     final isAllDay = ref.watch(allDayEventProvider);
     final dateFormat = isAllDay ? 'yyyy-MM-dd' : 'yyyy-MM-dd kk:mm';
 
@@ -96,18 +129,32 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
         ),
         actions: <Widget>[
           TextButton(
-            onPressed: () {
-              String enteredTitle = _titleController.text;
-              String enteredComments = _commentsController.text; 
-               DateTime startDateTime = ref.read(dateTimeStartProvider);
-               DateTime endDateTime = ref.read(dateTimeEndProvider);
-              // ここに保存のロジックを記述
-    ref.read(eventTitleProvider.notifier).state = enteredTitle;// TextFieldから入力されたタイトル;
-    ref.read(eventCommentsProvider.notifier).state = enteredComments; // TextFieldから入力されたコメント;
-    ref.read(eventDateTimeStartProvider.notifier).state = startDateTime; // DateTimePickerから選択された日時;
-    ref.read(eventDateTimeEndProvider.notifier).state = endDateTime;
-    Navigator.pop(context); // ポップアップを閉じる
+                      onPressed: () {
+               final enteredTitle = ref.read(titleProvider);
+              final enteredComments = ref.read(commentsProvider);
+              final startDateTime = ref.read(dateTimeStartProvider);
+              final endDateTime = ref.read(dateTimeEndProvider);
+              final isAllDay = ref.read(allDayEventProvider);
+
+              ref.read(eventListProvider.notifier).update((state) {
+                return state.map((event) {
+                  if (event.id == eventId) {
+                    return Event(
+                      id: event.id,
+                      title: enteredTitle,
+                      startDateTime: startDateTime,
+                      endDateTime: endDateTime,
+                      comments: enteredComments,
+                      isAllDay: isAllDay,
+                    );
+                  }
+                  return event;
+                }).toList();
+              });
+
+              Navigator.pop(context);
             },
+
             child: const 
             Text('保存',
               style: TextStyle(
@@ -122,13 +169,17 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
           children:  <Widget>[
             TextField(
                controller: _titleController,
+                onChanged: (value) {
+                // テキストが変更されたらStateProviderの状態を更新
+                ref.read(titleProvider.notifier).state = value;
+              },
               decoration: InputDecoration(
                 labelText: ('タイトルを入力してください'),
               ),
             ),
           SwitchListTile(
                 title: Text('終日'),
-                value: ref.watch(allDayEventProvider), 
+                value: ref.watch(allDayEventProvider),
                onChanged: (bool value) {
                ref.read(allDayEventProvider.notifier).state = value; 
                },
@@ -142,7 +193,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
                   builder: (context, ref, child) {
                   final selectedDate = ref.watch(dateTimeStartProvider);
                  return Container(
-                  child:Text("開始"+DateFormat(dateFormat).format(selectedDate))
+                  child:Text("開始: ${DateFormat(dateFormat).format(selectedDate)}"),
                  );
                 },
                ),
@@ -153,13 +204,17 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
                   builder: (context, ref, child) {
                   final selectedDate = ref.watch(dateTimeEndProvider);
                  
-                 return Text("終了"+DateFormat(dateFormat).format(selectedDate));
+                 return Text("終了: ${DateFormat(dateFormat).format(selectedDate)}");
                 },
                ),
               ),
 
            TextField(
-             controller: _commentsController, 
+               controller: _commentsController, 
+                onChanged: (value) {
+                // テキストが変更されたらStateProviderの状態を更新
+                ref.read(commentsProvider.notifier).state = value;
+                },
               keyboardType: TextInputType.multiline,
               maxLines: 6,
               decoration: InputDecoration(
