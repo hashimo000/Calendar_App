@@ -3,14 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';//datetimepickerの最新バージョンインポート
 import 'package:intl/intl.dart';
 import 'package:calendar/Calendar/addPage.dart';
-// final dateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
-// final dateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now());
-// final allDayEventProvider = StateProvider<bool>((ref) => false); 
-// // イベントタイトルと日時を保持するプロバイダー
-// final eventTitleProvider = StateProvider<String>((ref) => '');
-// final eventDateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
-// final eventDateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now());
-// final eventCommentsProvider = StateProvider<String>((ref) => '');
+
 final TextEditingController _titleController = TextEditingController();
 final TextEditingController _commentsController = TextEditingController();
 // Providerの定義
@@ -221,6 +214,13 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
               labelText: 'コメントを入力してください',
               border: OutlineInputBorder(), // 枠線を追加して入力フィールドをはっきりさせる
              ),
+            ),
+             TextButton(
+              onPressed: () {
+                // ここでイベント削除のロジックを実行
+                _deleteEvent();
+              },
+              child: Text('削除'),
             ),
           ],
         )

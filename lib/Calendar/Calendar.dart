@@ -118,9 +118,8 @@ for (int i = 1; i <= lastDay; i++) {
               debugPrint(event.endDateTime.toString());
               debugPrint(event.comments);
               debugPrint(event.isAllDay.toString());
-
                   Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => EditPage(eventId: event.id,),
+                      builder: (context) => EditPage(eventId: event.id),
                   ));
               },
             );
