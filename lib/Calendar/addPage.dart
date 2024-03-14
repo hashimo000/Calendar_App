@@ -15,6 +15,7 @@ final TextEditingController _commentsController = TextEditingController();
 final eventListProvider = StateProvider<List<Event>>((ref) => []);
 
 class Event {
+  final int id;
   String title;
   DateTime startDateTime;
   DateTime endDateTime;
@@ -22,6 +23,7 @@ class Event {
   bool isAllDay;
 
   Event({
+    required this.id,
     required this.title,
     required this.startDateTime,
     required this.endDateTime,
@@ -114,13 +116,16 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
           TextButton(
             onPressed: () {
              // 新しいイベントを作成
-             Event newEvent = Event(
-                   title: _titleController.text,
-                   startDateTime: ref.read(dateTimeStartProvider),
-                   endDateTime: ref.read(dateTimeEndProvider),
-                   comments: _commentsController.text,
-                   isAllDay: ref.read(allDayEventProvider),
-                   );
+              final currentList = ref.read(eventListProvider);
+              final newId = currentList.isNotEmpty ? currentList.last.id + 1 : 1; // 新しいIDを生成
+              final newEvent = Event(
+                   id: newId, // 新しいIDをイベントに割り当て
+                   title: _titleController.text, // タイトル
+                   startDateTime: ref.read(dateTimeStartProvider), // 開始時間
+                   endDateTime: ref.read(dateTimeEndProvider), // 終了時間
+                   comments: _commentsController.text, // コメント
+                   isAllDay: ref.read(allDayEventProvider), // 終日フラグ
+                );
                 // 現在のイベントリストに新しいイベントを追加して更新
             ref.read(eventListProvider.notifier).update((state) => [...state, newEvent]);
 
