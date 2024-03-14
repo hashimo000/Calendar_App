@@ -32,9 +32,30 @@ class Event {
   });
 }
 
-class AddPage extends ConsumerWidget {
+class AddPage extends ConsumerStatefulWidget {
   const AddPage({Key? key,}) : super(key: key);
-  
+   @override
+  _AddPageState createState() => _AddPageState();
+}
+class _AddPageState extends ConsumerState<AddPage> {
+  @override
+  void initState() {
+    super.initState();
+    WidgetsBinding.instance.addPostFrameCallback((_) => resetFormState());
+  }
+
+  void resetFormState() {
+    // テキストフィールドをクリア
+    _titleController.clear();
+    _commentsController.clear();
+
+    // 状態プロバイダーをリセット
+    ref.read(allDayEventProvider.notifier).state = false;
+    ref.read(dateTimeStartProvider.notifier).state = DateTime.now();
+    ref.read(dateTimeEndProvider.notifier).state = DateTime.now();
+  }
+
+
 void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
   if (isAllDay) {
@@ -98,7 +119,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
 }
 
   @override
-  Widget build(BuildContext context, WidgetRef ref) {
+  Widget build(BuildContext context) {
     final isAllDay = ref.watch(allDayEventProvider);
     final dateFormat = isAllDay ? 'yyyy-MM-dd' : 'yyyy-MM-dd kk:mm';
 
