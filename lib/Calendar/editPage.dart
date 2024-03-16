@@ -100,6 +100,38 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
     );
   }
 }
+void _deleteEvent() {
+    ref.read(eventListProvider.notifier).update((state) {
+      return state.where((event) => event.id != widget.eventId).toList();
+    });
+    Navigator.of(context).pop(); // ダイアログを閉じる
+  }
+void _showDeleteConfirmationDialog() {
+  showDialog(
+    context: context,
+    builder: (BuildContext context) {
+      return AlertDialog(
+        title: Text('予定の削除'),
+        content: Text('本当にこの日の予定を削除しますか？'),
+        actions: <Widget>[
+          TextButton(
+            onPressed: () {
+              Navigator.of(context).pop(); // ダイアログを閉じる
+            },
+            child: Text('キャンセル'),
+          ),
+          TextButton(
+            onPressed: () {
+              _deleteEvent();
+              Navigator.of(context).pop(); // ダイアログを閉じ、削除処理を実行
+            },
+            child: Text('削除'),
+          ),
+        ],
+      );
+    },
+  );
+}
 
 
  @override
@@ -216,11 +248,8 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
              ),
             ),
              TextButton(
-              onPressed: () {
-                // ここでイベント削除のロジックを実行
-                _deleteEvent();
-              },
-              child: Text('削除'),
+              onPressed: _showDeleteConfirmationDialog, // 削除確認ダイアログを表示する関数を呼び出す
+              child: Text('この予定を削除'),
             ),
           ],
         )
