@@ -167,7 +167,8 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
             child: const 
             Text('保存',
               style: TextStyle(
-                color: Colors.white, // アプリバーの色に合わせて文字色を白に設定
+                color: Colors.black,
+                backgroundColor: Colors.white,
               ),
             ),
           ),
