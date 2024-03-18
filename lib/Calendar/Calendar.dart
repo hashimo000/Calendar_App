@@ -27,8 +27,13 @@ class CalendarPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-
+    DateTime date = DateTime.now();
     List<String> weekDay = ["月", "火", "水", "木", "金", "土", "日"];
+    // DateTimeから曜日のインデックスを取得（Dartでは1が月曜日なので、リストのインデックスに合わせて-1します）
+    String weekDayName = weekDay[date.weekday - 1];
+
+    // 日付と曜日を組み合わせた文字列を作成
+    String dateStringTitle = '${date.year}/${date.month}/${date.day}(${weekDayName})';
 
     // 月の最初の日が何曜日かを取得(1: 月曜日, 7: 日曜日)
     int weekDayOfFirstDay = firstDayOfMonth.weekday;
@@ -75,11 +80,14 @@ for (int i = 1; i <= lastDay; i++) {
     }).toList();
 
     return AlertDialog(
+      backgroundColor: Colors.white,
       title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, 
         children: [
-          Text(dateString),
-          FloatingActionButton(
-            child: Icon(Icons.add),
+          Text(dateStringTitle),
+          IconButton(
+            icon: Icon(Icons.add),
+            color: Colors.blue,    
             onPressed: (){
               Navigator.of(context).push(
                 MaterialPageRoute(builder: (context) => AddPage()),
