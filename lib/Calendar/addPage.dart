@@ -134,8 +134,9 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
           },
         ),
         actions: <Widget>[
-          TextButton(
-            onPressed: () {
+          OutlinedButton(
+            onPressed: _titleController.text.isNotEmpty && _commentsController.text.isNotEmpty 
+            ?() {
              // 新しいイベントを作成
               final currentList = ref.read(eventListProvider);
               final newId = currentList.isNotEmpty ? currentList.last.id + 1 : 1; // 新しいIDを生成
@@ -163,12 +164,20 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
     ref.read(eventDateTimeStartProvider.notifier).state = startDateTime; // DateTimePickerから選択された日時;
     ref.read(eventDateTimeEndProvider.notifier).state = endDateTime;
     Navigator.pop(context); // ポップアップを閉じる
-            },
+            }
+            :null,
+            
+            style: OutlinedButton.styleFrom(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+      
+    ),
+    backgroundColor: Colors.white,
+  ),
             child: const 
             Text('保存',
               style: TextStyle(
-                color: Colors.black,
-                backgroundColor: Colors.white,
+                color: Colors.black,     
               ),
             ),
           ),
