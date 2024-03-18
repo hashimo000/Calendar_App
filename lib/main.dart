@@ -12,7 +12,7 @@ class MyApp extends StatelessWidget {
  @override
 Widget build(BuildContext context) {
   return MaterialApp(
-    localizationsDelegates: [.
+    localizationsDelegates: [
     GlobalMaterialLocalizations.delegate,
     GlobalWidgetsLocalizations.delegate, // Ensure this is spelled correctly
     GlobalCupertinoLocalizations.delegate,
