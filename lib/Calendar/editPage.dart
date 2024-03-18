@@ -21,6 +21,12 @@ class EditPage extends ConsumerStatefulWidget {
 class _EditPageState extends ConsumerState<EditPage> {
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _commentsController = TextEditingController();
+  late String _initialTitle;
+  late String _initialComments;
+  late DateTime _initialStartDateTime;
+  late DateTime _initialEndDateTime;
+  late bool _initialIsAllDay;
+
 
   @override
   void initState() {
@@ -29,6 +35,11 @@ class _EditPageState extends ConsumerState<EditPage> {
       final event = ref.read(eventListProvider).where((event) => event.id == widget.eventId).first;
       _titleController.text = event.title; // 既存のイベントタイトルを設定
       _commentsController.text = event.comments; // 既存のイベントコメントを設定
+       _initialTitle = event.title;
+      _initialComments = event.comments;
+      _initialStartDateTime = event.startDateTime;
+      _initialEndDateTime = event.endDateTime;
+      _initialIsAllDay = event.isAllDay;
     });
   }
 
@@ -38,7 +49,49 @@ class _EditPageState extends ConsumerState<EditPage> {
     _commentsController.dispose();
     super.dispose();
   }
+  bool _isEdited() {
+   final currentStartDateTime = ref.read(dateTimeStartProvider);
+    final currentEndDateTime = ref.read(dateTimeEndProvider);
+    final currentIsAllDay = ref.watch(allDayEventProvider);
+    return _titleController.text != _initialTitle ||
+           _commentsController.text != _initialComments ||
+           currentStartDateTime != _initialStartDateTime ||
+           currentEndDateTime != _initialEndDateTime ||
+           currentIsAllDay != _initialIsAllDay;
+  }
+void _showActionSheet() {
+    showModalBottomSheet(
+      context: context,
+      builder: (BuildContext context) {
+        return SafeArea(
+          child: Wrap(
+            children: <Widget>[
+              ListTile(
+                  leading: Icon(Icons.delete),
+                  title: Text('編集を破棄'),
+                  onTap: () {
+                    _titleController.text = _initialTitle;
+                    _commentsController.text = _initialComments;
+                    ref.read(dateTimeStartProvider.notifier).state = _initialStartDateTime;
+                    ref.read(dateTimeEndProvider.notifier).state = _initialEndDateTime;
+                    ref.read(allDayEventProvider.notifier).state = _initialIsAllDay;
 
+                    Navigator.pop(context); 
+                    Navigator.pop(context); 
+                  }),
+              ListTile(
+                leading: Icon(Icons.cancel),
+                title: Text('キャンセル'),
+                onTap: () {
+                  Navigator.pop(context); 
+                },
+              ),
+            ],
+          ),
+        );
+      },
+    );
+  }
 void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
   if (isAllDay) {
@@ -148,8 +201,12 @@ void _showDeleteConfirmationDialog() {
         backgroundColor: Colors.blueAccent,
         leading: IconButton(
           icon: const Icon(Icons.close), // ×アイコンを設定
-          onPressed: () {
-            Navigator.pop(context); // ボタンをタップした時、元の画面に戻る
+           onPressed: () {
+            if (_isEdited()) {
+              _showActionSheet();
+            } else {
+              Navigator.pop(context);
+            }
           },
         ),
         actions: <Widget>[
