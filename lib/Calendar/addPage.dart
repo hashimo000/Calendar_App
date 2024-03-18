@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_datetime_picker_plus/flutter_datetime_picker_plus.dart';//datetimepickerの最新バージョンインポート
 import 'package:intl/intl.dart';
+import 'package:flutter/cupertino.dart';
+
 final dateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final dateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final allDayEventProvider = StateProvider<bool>((ref) => false); 
@@ -13,7 +15,7 @@ final eventCommentsProvider = StateProvider<String>((ref) => '');
 final TextEditingController _titleController = TextEditingController();
 final TextEditingController _commentsController = TextEditingController();
 final eventListProvider = StateProvider<List<Event>>((ref) => []);
-
+final now = DateTime.now();
 class Event {
   final int id;
   String title;
@@ -57,34 +59,38 @@ class _AddPageState extends ConsumerState<AddPage> {
 
 
 void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
+  
   final isAllDay = ref.watch(allDayEventProvider);
-  if (isAllDay) {
-    DatePicker.showDatePicker(
-      context,
-      showTitleActions: true,
-      minTime: DateTime(2022, 5, 5),
-      maxTime: DateTime(2030, 6, 7),
-      onConfirm: (date) {
-        // 日付のみを設定
-        ref.read(dateTimeStartProvider.notifier).update((state) => DateTime(date.year, date.month, date.day));
-      },
-      currentTime: ref.watch(dateTimeStartProvider),
-      locale: LocaleType.jp,
-    );
-  } else {
-    // ここでDateTimePickerを表示
-    DatePicker.showDateTimePicker(
-      context,
-      showTitleActions: true,
-      minTime: DateTime(2022, 5, 5, 0, 00),
-      maxTime: DateTime(2030, 6, 7, 23, 59),
-      onConfirm: (date) {
-        ref.read(dateTimeStartProvider.notifier).update((state) => date);
-      },
-      currentTime: ref.watch(dateTimeStartProvider),
-      locale: LocaleType.jp,
-    );
-  }
+  
+  
+  showCupertinoModalPopup(
+    context: context,
+    builder: (_) => Container(
+      height: 250,
+      color: Colors.white,
+      child: Column(
+        children: [
+          Container(
+            height: 200,
+            
+            child: CupertinoDatePicker(
+              
+              initialDateTime:  DateTime(now.year, now.month, now.day,  ),
+              mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
+              onDateTimeChanged: (DateTime newDate) {
+                ref.read(dateTimeStartProvider.notifier).update((state) => newDate);
+              },
+                locale: Locale('ja'),
+              minimumDate: DateTime(2022, 5, 5),
+              maximumDate: DateTime(2030, 6, 7),
+            ),
+          ),
+          
+        ],
+      ),
+    ),
+  );
+   
 }
 
 void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
@@ -136,7 +142,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
         actions: <Widget>[
           OutlinedButton(
             onPressed: _titleController.text.isNotEmpty && _commentsController.text.isNotEmpty 
-            ?() {
+            ?  () {
              // 新しいイベントを作成
               final currentList = ref.read(eventListProvider);
               final newId = currentList.isNotEmpty ? currentList.last.id + 1 : 1; // 新しいIDを生成
@@ -165,7 +171,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
     ref.read(eventDateTimeEndProvider.notifier).state = endDateTime;
     Navigator.pop(context); // ポップアップを閉じる
             }
-            :null,
+         :null ,
             
             style: OutlinedButton.styleFrom(
     shape: RoundedRectangleBorder(
