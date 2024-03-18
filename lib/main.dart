@@ -20,6 +20,7 @@ Widget build(BuildContext context) {
       supportedLocales: [
         const Locale('ja'),
       ],
+         locale: Locale('ja'),
     home: Scaffold(
       appBar: AppBar(
         title: Text('カレンダービュー'),
