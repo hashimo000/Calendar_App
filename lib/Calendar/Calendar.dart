@@ -134,20 +134,29 @@ BoxDecoration? boxDecoration;
       margin: EdgeInsets.all(8), // カードの周りのマージンを設定
       child: ListTile(
         title: Row(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: <Widget>[
-            event.isAllDay ? Text("終日", style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)) :
-            Column(
-                children: <Widget>[
-                    Text(DateFormat("HH:mm").format(event.startDateTime)), // 修正点: dateTimeStartをeventのプロパティに変更
-                    Text(DateFormat("HH:mm").format(event.endDateTime)), // 修正点: dateTimeEndをeventのプロパティに変更
-                ],
-            ),
-            Expanded(
-              child: Text(event.title, style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
-            ),
-          ],
-        ),
+  crossAxisAlignment: CrossAxisAlignment.center, // 中央揃えにする
+  children: <Widget>[
+    event.isAllDay
+        ? Text("終日", style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold))
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.center, // 子要素を中央揃えにする
+            children: <Widget>[
+              Text(DateFormat("HH:mm").format(event.startDateTime)),
+              Text(DateFormat("HH:mm").format(event.endDateTime)),
+            ],
+          ),
+    Container(
+      height: 24, // 線の高さ
+      width: 2, // 線の幅
+      color: Colors.blue, // 線の色
+      margin: EdgeInsets.symmetric(horizontal: 8), // 左右のマージン
+    ),
+    Expanded(
+      child: Text(event.title, style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
+    ),
+  ],
+),
+
         onTap: () { // ここでGestureDetectorをListTileのonTapに変更
         debugPrint(event.id.toString());
         debugPrint(event.title);
