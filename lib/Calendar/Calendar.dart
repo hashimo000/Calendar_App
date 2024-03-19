@@ -45,14 +45,9 @@ class CalendarPage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    DateTime date = DateTime.now();
+    
     List<String> weekDay = ["月", "火", "水", "木", "金", "土", "日"];
-    // DateTimeから曜日のインデックスを取得（Dartでは1が月曜日なので、リストのインデックスに合わせて-1します）
-    String weekDayName = weekDay[date.weekday - 1];
-
-    // 日付と曜日を組み合わせた文字列を作成
-    String dateStringTitle = '${date.year}/${date.month}/${date.day}(${weekDayName})';
-
+ 
     // 月の最初の日が何曜日かを取得(1: 月曜日, 7: 日曜日)
     int weekDayOfFirstDay = firstDayOfMonth.weekday;
     int lastDay = DateTime(firstDayOfMonth.year, firstDayOfMonth.month + 1, 0).day;
@@ -94,6 +89,11 @@ BoxDecoration? boxDecoration;
   }
  dayWidgets.add(GestureDetector(
       onTap: () {
+        // タップされた日付に基づいて曜日名を取得
+      String weekDayName = weekDay[date.weekday - 1];
+      // タップされた日付を使用してタイトル文字列を生成
+      String dateStringTitle = '${date.year}/${date.month}/${date.day}(${weekDayName})';
+      // タップされた日付に対応するイベントリストを表示するダイアログを表示
         showDialog(
   context: context,
   builder: (BuildContext context) {
