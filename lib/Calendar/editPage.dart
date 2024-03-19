@@ -210,7 +210,7 @@ void _showDeleteConfirmationDialog() {
           },
         ),
         actions: <Widget>[
-          TextButton(
+          OutlinedButton(
                       onPressed: () {
                final enteredTitle = ref.read(titleProvider);
               final enteredComments = ref.read(commentsProvider);
@@ -236,11 +236,17 @@ void _showDeleteConfirmationDialog() {
 
               Navigator.pop(context);
             },
-
+             style: OutlinedButton.styleFrom(
+    shape: RoundedRectangleBorder(
+      borderRadius: BorderRadius.circular(16),
+      
+    ),
+    backgroundColor: Colors.white,
+  ),
             child: const 
             Text('保存',
               style: TextStyle(
-                color: Colors.white, // アプリバーの色に合わせて文字色を白に設定
+                color: Colors.black, // アプリバーの色に合わせて文字色を白に設定
               ),
             ),
           ),
