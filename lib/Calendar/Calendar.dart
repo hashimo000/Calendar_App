@@ -127,39 +127,43 @@ BoxDecoration? boxDecoration;
         width: 400,
         height: 500,
         child: ListView.builder(
-          itemCount: eventsForSelectedDay.length,
-          itemBuilder: (context, index) {
-            final event = eventsForSelectedDay[index];
-            return ListTile(
-              title: Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
+  itemCount: eventsForSelectedDay.length,
+  itemBuilder: (context, index) {
+    final event = eventsForSelectedDay[index];
+    return Card(
+      margin: EdgeInsets.all(8), // カードの周りのマージンを設定
+      child: ListTile(
+        title: Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            event.isAllDay ? Text("終日", style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)) :
+            Column(
                 children: <Widget>[
-                  event.isAllDay ? Text("終日", style: TextStyle(fontSize: 20, color: textColor, fontWeight: FontWeight.bold)) :
-                  Column(
-                      children: <Widget>[
-                          Text(DateFormat("HH:mm").format(event.startDateTime)), // 修正点: dateTimeStartをeventのプロパティに変更
-                          Text(DateFormat("HH:mm").format(event.endDateTime)), // 修正点: dateTimeEndをeventのプロパティに変更
-                      ],
-                  ),
-                  Expanded(
-                    child: Text(event.title, style: TextStyle(fontSize: 20, color: textColor, fontWeight: FontWeight.bold)),
-                  ),
+                    Text(DateFormat("HH:mm").format(event.startDateTime)), // 修正点: dateTimeStartをeventのプロパティに変更
+                    Text(DateFormat("HH:mm").format(event.endDateTime)), // 修正点: dateTimeEndをeventのプロパティに変更
                 ],
-              ),
-              onTap: () { // ここでGestureDetectorをListTileのonTapに変更
-              debugPrint(event.id.toString());
-              debugPrint(event.title);
-              debugPrint(event.startDateTime.toString());
-              debugPrint(event.endDateTime.toString());
-              debugPrint(event.comments);
-              debugPrint(event.isAllDay.toString());
-                  Navigator.of(context).push(MaterialPageRoute(
-                      builder: (context) => EditPage(eventId: event.id),
-                  ));
-              },
-            );
-          },
+            ),
+            Expanded(
+              child: Text(event.title, style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
+            ),
+          ],
         ),
+        onTap: () { // ここでGestureDetectorをListTileのonTapに変更
+        debugPrint(event.id.toString());
+        debugPrint(event.title);
+        debugPrint(event.startDateTime.toString());
+        debugPrint(event.endDateTime.toString());
+        debugPrint(event.comments);
+        debugPrint(event.isAllDay.toString());
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => EditPage(eventId: event.id),
+            ));
+        },
+      ),
+    );
+  },
+)
+
       ),
       actions: <Widget>[
         TextButton(
