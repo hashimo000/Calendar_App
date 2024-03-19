@@ -82,7 +82,16 @@ for (int i = 1; i <= lastDay; i++) {
   if (holidayData.containsKey(dateString)) {
     textColor = Colors.red;
   }
-
+BoxDecoration? boxDecoration;
+  if (DateTime.now().year == date.year && DateTime.now().month == date.month && DateTime.now().day == date.day) {
+    // 本日の日付に対するデザイン
+    boxDecoration = BoxDecoration(
+      color: Colors.blue, // 背景色を青に設定
+      shape: BoxShape.circle, // 丸形
+      
+    );
+    textColor = Colors.white; // 本日のテキスト色を白に設定
+  }
  dayWidgets.add(GestureDetector(
       onTap: () {
         showDialog(
@@ -165,11 +174,15 @@ for (int i = 1; i <= lastDay; i++) {
         );
       },
       child: Container(
-        padding: const EdgeInsets.all(4.0),
+        width: 10, // 丸の幅を設定
+        height: 10, // 丸の高さを設定
+        alignment: Alignment.center, // テキストを中央に配置
+        decoration: boxDecoration, 
         child: Text(
           '$i',
           textAlign: TextAlign.center,
-          style: TextStyle(color: textColor),
+          style: TextStyle(color: textColor,fontSize: 14),
+          
         ),
       ),
     ));
