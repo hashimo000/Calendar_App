@@ -5,17 +5,27 @@ import 'package:calendar/Calendar/holiday.dart';
 import 'package:calendar/Calendar/addPage.dart';
 import 'package:calendar/Calendar/editPage.dart';
 class CalendarView extends ConsumerWidget {
-  const CalendarView({Key? key}) : super(key: key);
+  final PageController _pageController = PageController(initialPage: 5000);
+void goToToday() {
+  DateTime now = DateTime.now();
+  DateTime firstOfCurrentMonth = DateTime(now.year, now.month, 1);
+  // 現在の月との差分を正確に計算
+  int monthsDifference = (now.year * 12 + now.month) - (firstOfCurrentMonth.year * 12 + firstOfCurrentMonth.month);
+  int pageIndex = 5000 + monthsDifference;
+  _pageController.jumpToPage(pageIndex);
+}
+
+  CalendarView({Key? key}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return PageView.builder(
       itemCount: 10000, // 必要に応じて適切な数値を設定
-      controller: PageController(initialPage: 5000),
+      controller: _pageController,
       itemBuilder: (context, index) {
         DateTime now = DateTime.now();
         DateTime firstOfMonth = DateTime(now.year, now.month + index - 5000, 1);
-        return CalendarPage(key: ValueKey(firstOfMonth), firstDayOfMonth: firstOfMonth);
+        return CalendarPage(key: ValueKey(firstOfMonth),firstDayOfMonth: firstOfMonth,goToToday: goToToday,);
       },
     );
   }
@@ -23,7 +33,8 @@ class CalendarView extends ConsumerWidget {
 
 class CalendarPage extends ConsumerWidget {
   final DateTime firstDayOfMonth;
-  const CalendarPage({Key? key, required this.firstDayOfMonth}) : super(key: key);
+   final Function goToToday;
+  const CalendarPage({Key? key, required this.firstDayOfMonth,required this.goToToday}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -163,7 +174,14 @@ for (int i = 1; i <= lastDay; i++) {
 
       body: Column(
         children: [
-          Align(
+          Row(
+            children: [
+              OutlinedButton(
+                onPressed: (){
+                  goToToday(); 
+                },
+              child: Text('今日に移動')),
+              Align(
             alignment: Alignment.topCenter,
             child: Container(
               padding: const EdgeInsets.symmetric(vertical: 8.0),
@@ -173,6 +191,9 @@ for (int i = 1; i <= lastDay; i++) {
               ),
             ),
           ),
+            ],
+          ),
+          
           Row(
             children: [
               for (var i = 0; i < 7; i++)
