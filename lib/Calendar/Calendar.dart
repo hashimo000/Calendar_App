@@ -6,6 +6,12 @@ import 'package:calendar/Calendar/addPage.dart';
 import 'package:calendar/Calendar/editPage.dart';
 class CalendarView extends ConsumerWidget {
   final PageController _pageController = PageController(initialPage: 5000);
+  void goToSelectedMonth(DateTime selectedDate) {
+  int monthsDifference = (selectedDate.year * 12 + selectedDate.month) - (DateTime.now().year * 12 + DateTime.now().month);
+  int pageIndex = 5000 + monthsDifference;
+  _pageController.jumpToPage(pageIndex);
+}
+
 void goToToday() {
   DateTime now = DateTime.now();
   DateTime firstOfCurrentMonth = DateTime(now.year, now.month, 1);
@@ -25,7 +31,7 @@ void goToToday() {
       itemBuilder: (context, index) {
         DateTime now = DateTime.now();
         DateTime firstOfMonth = DateTime(now.year, now.month + index - 5000, 1);
-        return CalendarPage(key: ValueKey(firstOfMonth),firstDayOfMonth: firstOfMonth,goToToday: goToToday,);
+        return CalendarPage(key: ValueKey(firstOfMonth),firstDayOfMonth: firstOfMonth,goToToday: goToToday,goToSelectedMonth: goToSelectedMonth, );
       },
     );
   }
@@ -34,7 +40,8 @@ void goToToday() {
 class CalendarPage extends ConsumerWidget {
   final DateTime firstDayOfMonth;
    final Function goToToday;
-  const CalendarPage({Key? key, required this.firstDayOfMonth,required this.goToToday}) : super(key: key);
+     final Function(DateTime) goToSelectedMonth; // この行を追加
+  const CalendarPage({Key? key, required this.firstDayOfMonth,required this.goToToday,required this.goToSelectedMonth}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -181,16 +188,23 @@ for (int i = 1; i <= lastDay; i++) {
                   goToToday(); 
                 },
               child: Text('今日に移動')),
-              Align(
-            alignment: Alignment.topCenter,
-            child: Container(
-              padding: const EdgeInsets.symmetric(vertical: 8.0),
-              child: Text(
-                DateFormat("yyyy年MM月").format(firstDayOfMonth),
-                style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-              ),
-            ),
-          ),
+              GestureDetector(
+  onTap: () async {
+    final DateTime? picked = await showDatePicker(
+      context: context,
+      initialDate: firstDayOfMonth, // 初期値は現在表示している月
+      firstDate: DateTime(2000), // 選択可能な最初の日付
+      lastDate: DateTime(2101), // 選択可能な最後の日付
+    );
+    if (picked != null) {
+      goToSelectedMonth(picked); // 選択された月に移動するメソッド
+    }
+  },
+  child: Text(
+    DateFormat("yyyy年MM月").format(firstDayOfMonth),
+    style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
+  ),
+)
             ],
           ),
           
