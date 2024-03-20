@@ -191,58 +191,79 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
           ),
         ],
       ),
-      body: Center(
-        child: Column(
-          children:  <Widget>[
+      body: Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: ListView(
+          children: <Widget>[
             TextField(
-               controller: _titleController,
+              controller: _titleController,
               decoration: InputDecoration(
                 labelText: ('タイトルを入力してください'),
               ),
             ),
-          SwitchListTile(
-                title: Text('終日'),
-                value: ref.watch(allDayEventProvider), 
-               onChanged: (bool value) {
-               ref.read(allDayEventProvider.notifier).state = value; 
-               },
-               
-               ),
+            SwitchListTile(
+              title: const Text('終日'),
+              value: isAllDay,
+              onChanged: (bool value) {
+                ref.read(allDayEventProvider.notifier).state = value;
+              },
+            ),
+            ListTile(
+  title: Row(
+    children: <Widget>[
+      Text('開始'),
+      SizedBox(width: 8.0), // この値はお好みで調整してください
+      // Consumerを使用して選択された開始時間を表示
+      Consumer(
+        builder: (context, ref, child) {
+          final selectedStart = ref.watch(dateTimeStartProvider);
+          return Expanded( // Expandedを使用して余白を埋める
+            child: Text(
+              DateFormat(dateFormat).format(selectedStart),
+              textAlign: TextAlign.end, // テキストを右寄せにする
+            ),
+          );
+        },
+      ),
+    ],
+  ),
+  onTap: () => _showDateTimePickerStart(context, ref),
+),
 
-            
-            GestureDetector(
-                  onTap: () => _showDateTimePickerStart(context, ref),
-                  child: Consumer(
-                  builder: (context, ref, child) {
-                  final selectedDate = ref.watch(dateTimeStartProvider);
-                 return Container(
-                  child:Text("開始"+DateFormat(dateFormat).format(selectedDate))
-                 );
-                },
-               ),
-              ),
-            GestureDetector(
-                  onTap: () => _showDateTimePickerEnd(context, ref),
-                  child: Consumer(
-                  builder: (context, ref, child) {
-                  final selectedDate = ref.watch(dateTimeEndProvider);
-                 
-                 return Text("終了"+DateFormat(dateFormat).format(selectedDate));
-                },
-               ),
-              ),
+          ListTile(
+  title: Row(
+    children: <Widget>[
+      Text('終了'),
+      SizedBox(width: 8.0), // この値はお好みで調整してください
+      // Consumerを使用して選択された開始時間を表示
+      Consumer(
+        builder: (context, ref, child) {
+          final selectedEnd = ref.watch(dateTimeEndProvider);
+          return Expanded( // Expandedを使用して余白を埋める
+            child: Text(
+              DateFormat(dateFormat).format(selectedEnd),
+              textAlign: TextAlign.end, // テキストを右寄せにする
+            ),
+          );
+        },
+      ),
+    ],
+  ),
+  onTap: () => _showDateTimePickerEnd(context, ref),
+),
 
-           TextField(
-             controller: _commentsController, 
+            TextField(
+              controller: _commentsController,
               keyboardType: TextInputType.multiline,
               maxLines: 6,
               decoration: InputDecoration(
-              labelText: 'コメントを入力してください',
-              border: OutlineInputBorder(), // 枠線を追加して入力フィールドをはっきりさせる
-             ),
+                labelText: 'コメントを入力してください',
+                border: const OutlineInputBorder(),
+              ),
             ),
+            // 保存ボタンは AppBar の actions 内にあります
           ],
-        )
+        ),
       ),
     );
   }
