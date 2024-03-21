@@ -19,6 +19,7 @@ dependencies:
  
   flutter_datetime_picker_plus: ^2.1.0
   flutter_localization: ^0.2.0
+  drift: ^2.16.0
 
 dev_dependencies:
   flutter_test:
