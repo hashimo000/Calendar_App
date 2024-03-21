@@ -221,7 +221,7 @@ void _showDeleteConfirmationDialog() {
               ref.read(eventListProvider.notifier).update((state) {
                 return state.map((event) {
                   if (event.id == eventId) {
-                    return Event(
+                    return Events(
                       id: event.id,
                       title: enteredTitle,
                       startDateTime: startDateTime,
