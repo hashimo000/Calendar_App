@@ -24,7 +24,7 @@ class AppDatabase extends _$AppDatabase {
 
   @override
   int get schemaVersion => 1;
-  Stream<List<Event>> watchTodoItems() {
+  Stream<List<Event>> watchEvents() {
     return (select(events)).watch();
   }
    Future<List<Event>> get allEvents => select(events).get();
@@ -41,7 +41,7 @@ class AppDatabase extends _$AppDatabase {
       ),
     );
   }
-  Future<int> updateTodoItems(
+  Future<int> updateEvents(
       { required Event event,required String title, required String comments,}) {
     return (update(events)..where((tbl) => tbl.id.equals(event.id)))
         .write(
@@ -54,7 +54,7 @@ class AppDatabase extends _$AppDatabase {
       ),
     );
   }
-   Future<void> deleteTodoItem(Event event) {
+   Future<void> deleteEvents(Event event) {
     return (delete(events)..where((tbl) => tbl.id.equals(event.id))).go();
   }
 }
