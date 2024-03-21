@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:calendar/Calendar/holiday.dart';
 import 'package:calendar/Calendar/addPage.dart';
 import 'package:calendar/Calendar/editPage.dart';
+import 'package:calendar/database.dart';
 class CalendarView extends ConsumerWidget {
   final PageController _pageController = PageController(initialPage: 5000);
   void goToSelectedMonth(DateTime selectedDate) {
@@ -21,8 +22,8 @@ void goToToday() {
   _pageController.jumpToPage(pageIndex);
 }
 
-  CalendarView({Key? key}) : super(key: key);
-
+  CalendarView({Key? key ,required this.database}) : super(key: key);
+  final AppDatabase database;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
     return PageView.builder(
