@@ -3,11 +3,13 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:calendar/Calendar/addPage.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:calendar/database.dart';
 final TextEditingController _titleController = TextEditingController();
 final TextEditingController _commentsController = TextEditingController();
 // Providerの定義
 final titleProvider = StateProvider<String>((ref) => '');
 final commentsProvider = StateProvider<String>((ref) => '');
+
 
 class EditPage extends ConsumerStatefulWidget {
   final int eventId;
@@ -221,7 +223,7 @@ void _showDeleteConfirmationDialog() {
               ref.read(eventListProvider.notifier).update((state) {
                 return state.map((event) {
                   if (event.id == eventId) {
-                    return Events(
+                    return EVENTS(
                       id: event.id,
                       title: enteredTitle,
                       startDateTime: startDateTime,
