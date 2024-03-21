@@ -34,21 +34,21 @@ class AppDatabase extends _$AppDatabase {
     return into(events).insert(
       EventsCompanion(
         title: Value(title),
-        startDateTime: Value(DateTime.now()),
-        endDateTime: Value(DateTime.now()),
+        startDateTime: Value(startDateTime),
+        endDateTime: Value(endDateTime),
         isAllDay: Value(false),
         comments: Value(comments),
       ),
     );
   }
   Future<int> updateEvents(
-      { required Event event,required String title, required String comments,}) {
+      { required Event event,required String title, required String comments,required DateTime startDateTime, required DateTime endDateTime, required bool isAllDay,}) {
     return (update(events)..where((tbl) => tbl.id.equals(event.id)))
         .write(
       EventsCompanion(
         title: Value(title),
-        startDateTime: Value(DateTime.now()),
-        endDateTime: Value(DateTime.now()),
+        startDateTime: Value(startDateTime),
+        endDateTime: Value(endDateTime),
         isAllDay: Value(false),
         comments: Value(comments),
       ),
@@ -60,12 +60,8 @@ class AppDatabase extends _$AppDatabase {
 }
 
 
-  // Future<List<Event>> getAllEvents() => select(events).get();
-  // Future insertEvent(Insertable<Event> event) => into(events).insert(event);
-  // Future updateEvent(Insertable<Event> event) => update(events).replace(event);
-  // Future deleteEvent(Insertable<Event> event) => delete(events).delete(event);
-
-LazyDatabase _openConnection() {
+ 
+LazyDatabase openConnection() {
   return LazyDatabase(() async {
     final dbFloder = await getApplicationDocumentsDirectory();
     final file = File(p.join(dbFloder.path, 'db.sqlite'));
