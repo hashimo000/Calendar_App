@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
-
 final dateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final dateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final allDayEventProvider = StateProvider<bool>((ref) => false); 
@@ -42,8 +41,14 @@ class _AddPageState extends ConsumerState<AddPage> {
   @override
   void initState() {
     super.initState();
+    _titleController.addListener(_updateButtonState);
+  _commentsController.addListener(_updateButtonState);
     WidgetsBinding.instance.addPostFrameCallback((_) => resetFormState());
   }
+  void _updateButtonState() {
+  setState(() {}); // 状態を更新してUIを再描画
+}
+
 
   void resetFormState() {
     // テキストフィールドをクリア
