@@ -22,8 +22,13 @@ class Events extends Table {
 class AppDatabase extends _$AppDatabase {
   AppDatabase(QueryExecutor e) : super(e);
 
+
   @override
   int get schemaVersion => 1;
+  Future<Event?> getEventById(int id) async {
+  return (select(events)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
+}
+
   Stream<List<Event>> watchEvents() {
     return (select(events)).watch();
   }
@@ -41,19 +46,26 @@ class AppDatabase extends _$AppDatabase {
       ),
     );
   }
-  Future<int> updateEvents(
-      { required Event event,required String title, required String comments,required DateTime startDateTime, required DateTime endDateTime, required bool isAllDay,}) {
-    return (update(events)..where((tbl) => tbl.id.equals(event.id)))
-        .write(
-      EventsCompanion(
-        title: Value(title),
-        startDateTime: Value(startDateTime),
-        endDateTime: Value(endDateTime),
-        isAllDay: Value(false),
-        comments: Value(comments),
-      ),
-    );
-  }
+  Future<int> updateEvents({
+    required Event event,
+    required String title, 
+    required String comments,
+    required DateTime startDateTime, 
+    required DateTime endDateTime, 
+    required bool isAllDay,
+}) {
+  return (update(events)..where((tbl) => tbl.id.equals(event.id)))
+      .write(
+    EventsCompanion(
+      title: Value(title),
+      startDateTime: Value(startDateTime),
+      endDateTime: Value(endDateTime),
+      isAllDay: Value(isAllDay), // 引数から受け取った値を使用するように修正
+      comments: Value(comments),
+    ),
+  );
+}
+
    Future<void> deleteEvents(Event event) {
     return (delete(events)..where((tbl) => tbl.id.equals(event.id))).go();
   }
