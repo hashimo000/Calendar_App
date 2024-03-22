@@ -4,8 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:calendar/Calendar/addPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:calendar/database.dart';
-final TextEditingController _titleController = TextEditingController();
-final TextEditingController _commentsController = TextEditingController();
 // Providerの定義
 final titleProvider = StateProvider<String>((ref) => '');
 final commentsProvider = StateProvider<String>((ref) => '');
@@ -27,22 +25,30 @@ class _EditPageState extends ConsumerState<EditPage> {
   late DateTime _initialStartDateTime;
   late DateTime _initialEndDateTime;
   late bool _initialIsAllDay;
+   late Event? _event; // データベースから読み込んだイベントデータを保持するための変数
 
 
-  @override
-  void initState() {
-    super.initState();
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      final event = ref.read(eventListProvider).where((event) => event.id == widget.eventId).first;
-      _titleController.text = event.title; // 既存のイベントタイトルを設定
-      _commentsController.text = event.comments; // 既存のイベントコメントを設定
-       _initialTitle = event.title;
-      _initialComments = event.comments;
-      _initialStartDateTime = event.startDateTime;
-      _initialEndDateTime = event.endDateTime;
-      _initialIsAllDay = event.isAllDay;
-    });
+@override
+void initState() {
+  super.initState();
+  WidgetsBinding.instance.addPostFrameCallback((_) async {
+  final database = ref.read(appDatabaseProvider);
+  final Event? event = await database.getEventById(widget.eventId); // eventはnull許容型
+
+  if (event != null) { // eventがnullでないことを確認
+    _titleController.text = event.title; // null許容ではないため、nullチェック後は安全にアクセスできる
+    _commentsController.text = event.comments ?? ''; // event.commentsがnullなら空文字を代入
+    _initialTitle = event.title; // 同上
+    _initialComments = event.comments ?? ''; // event.commentsがnullなら空文字を代入
+    _initialStartDateTime = event.startDateTime; // null許容ではないため、nullチェック後は安全にアクセスできる
+    _initialEndDateTime = event.endDateTime; // 同上
+    _initialIsAllDay = event.isAllDay; // null許容ではないため、nullチェック後は安全にアクセスできる
+    _event = event; // 読み込んだイベントデータをメンバ変数に保存
   }
+});
+
+}
+
 
   @override
   void dispose() {
@@ -142,7 +148,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
               initialDateTime:  DateTime(now.year, now.month, now.day, ),
               mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
               onDateTimeChanged: (DateTime newDate) {
-                ref.read(dateTimeStartProvider.notifier).update((state) => newDate);
+                ref.read(dateTimeEndProvider.notifier).update((state) => newDate);
               },
               minimumDate: DateTime(2022, 5, 5),
               maximumDate: DateTime(2030, 6, 7),
@@ -213,13 +219,25 @@ void _showDeleteConfirmationDialog() {
         ),
         actions: <Widget>[
           OutlinedButton(
-                      onPressed: () {
-               final enteredTitle = ref.read(titleProvider);
-              final enteredComments = ref.read(commentsProvider);
-              final startDateTime = ref.read(dateTimeStartProvider);
-              final endDateTime = ref.read(dateTimeEndProvider);
-              final isAllDay = ref.read(allDayEventProvider);
-
+             onPressed: () async{
+              
+                        // 入力されたデータを取得
+             final enteredTitle = _titleController.text;
+             final enteredComments = _commentsController.text;
+             final startDateTime = _initialStartDateTime; // ここは実際にはユーザーが選択する値に置き換える
+             final endDateTime = _initialEndDateTime; // 同上
+             final isAllDay = _initialIsAllDay; // 同上
+  // データベースに保存
+  final database = ref.read(appDatabaseProvider);
+  await database.updateEvents(
+    event: _event!,
+    title: enteredTitle,
+    comments: enteredComments,
+    startDateTime: ref.read(dateTimeStartProvider),
+    endDateTime: ref.read(dateTimeEndProvider),
+    isAllDay: ref.read(allDayEventProvider),
+  );
+              
               ref.read(eventListProvider.notifier).update((state) {
                 return state.map((event) {
                   if (event.id == eventId) {
