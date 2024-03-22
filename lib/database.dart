@@ -64,7 +64,7 @@ Future<int> deleteEventById(int id) async {
       title: Value(title),
       startDateTime: Value(startDateTime),
       endDateTime: Value(endDateTime),
-      isAllDay: Value(isAllDay), // 引数から受け取った値を使用するように修正
+      isAllDay: Value(isAllDay), 
       comments: Value(comments),
     ),
   );

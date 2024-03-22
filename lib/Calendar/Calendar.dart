@@ -123,8 +123,8 @@ BoxDecoration? boxDecoration;
         return CircularProgressIndicator(); // データ取得中はローディング表示
       } else if (snapshot.hasError) {
         return Text('エラーが発生しました');
-      } else if (snapshot.hasData) {
-        // データが取得できた場合、イベントデータを表示するUIを構築
+      } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+        // データが取得でき、予定がある場合、イベントデータを表示するUIを構築
         final events = snapshot.data!;
         // ここで events を使用してイベントリストを表示するロジックを追加
     return AlertDialog(
@@ -205,9 +205,36 @@ BoxDecoration? boxDecoration;
       ],
     );
       }else {
-        return Text('データがありません');
-      }
-    }
+    // データはあるがリストが空の場合、またはデータがまったくない場合
+    return AlertDialog(
+      backgroundColor: Colors.white,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+        children: [
+          Text(dateStringTitle),
+          IconButton(
+            icon: Icon(Icons.add),
+            color: Colors.blue,    
+            onPressed: (){
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => AddPage()),
+              );
+            }
+          )
+        ],
+      ),
+      content: Container(
+        width: 400,
+        height: 500,
+        child:  Center(
+          child: Text('予定はありません。'),
+        )
+        
+        )
+        );
+  }
+}
+    
     );
   },
         );
