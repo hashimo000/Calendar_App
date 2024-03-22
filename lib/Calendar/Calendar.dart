@@ -229,12 +229,10 @@ BoxDecoration? boxDecoration;
         child:  Center(
           child: Text('予定はありません。'),
         )
-        
         )
         );
-  }
-}
-    
+       }
+     }
     );
   },
         );

@@ -209,12 +209,20 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
             }
          :null ,
             
-            style: OutlinedButton.styleFrom(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(16),
-      
+            style: ButtonStyle(
+    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+      (Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return Colors.grey; // ボタン非活性時の背景色
+        }
+        return Colors.white; // デフォルトの背景色
+      },
     ),
-    backgroundColor: Colors.white,
+    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    ),
   ),
             child: const 
             Text('保存',
