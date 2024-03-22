@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:calendar/database.dart';
 final dateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final dateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final allDayEventProvider = StateProvider<bool>((ref) => false); 
@@ -12,9 +13,13 @@ final eventDateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now()
 final eventCommentsProvider = StateProvider<String>((ref) => '');
 final TextEditingController _titleController = TextEditingController();
 final TextEditingController _commentsController = TextEditingController();
-final eventListProvider = StateProvider<List<Event>>((ref) => []);
+final eventListProvider = StateProvider<List<EVENTS>>((ref) => []);
 final now = DateTime.now();
-class Event {
+final appDatabaseProvider = Provider<AppDatabase>((ref) {
+  final database = AppDatabase(openConnection());
+  return database;
+});
+class EVENTS {
   final int id;
   String title;
   DateTime startDateTime;
@@ -22,7 +27,7 @@ class Event {
   String comments;
   bool isAllDay;
 
-  Event({
+  EVENTS({
     required this.id,
     required this.title,
     required this.startDateTime,
@@ -45,9 +50,23 @@ class _AddPageState extends ConsumerState<AddPage> {
   _commentsController.addListener(_updateButtonState);
     WidgetsBinding.instance.addPostFrameCallback((_) => resetFormState());
   }
+ @override
+  void dispose() {
+    // ウィジェットが破棄される前にリスナーを削除
+    _titleController.removeListener(_updateButtonState);
+    _commentsController.removeListener(_updateButtonState);
+
+    // 破棄プロセスを完了するために、スーパーメソッドを呼び出すことを忘れないでください
+    super.dispose();
+  }
+
   void _updateButtonState() {
-  setState(() {}); // 状態を更新してUIを再描画
-}
+    // setStateを呼び出す前に、ウィジェットがまだマウントされているかどうかをチェック
+    if (mounted) {
+      setState(() {}); // ウィジェットがまだツリーに存在する場合のみ、状態を更新
+    }
+  }
+
 
 
   void resetFormState() {
@@ -116,7 +135,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
               initialDateTime:  DateTime(now.year, now.month, now.day, ),
               mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
               onDateTimeChanged: (DateTime newDate) {
-                ref.read(dateTimeStartProvider.notifier).update((state) => newDate);
+                ref.read(dateTimeEndProvider.notifier).update((state) => newDate);
               },
               minimumDate: DateTime(2022, 5, 5),
               maximumDate: DateTime(2030, 6, 7),
@@ -149,11 +168,21 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
         actions: <Widget>[
           OutlinedButton(
             onPressed: _titleController.text.isNotEmpty && _commentsController.text.isNotEmpty 
-            ?  () {
+            ?  ()async {
+              final database = ref.read(appDatabaseProvider);
+             // データベースにイベントを追加
+              await database.addEvent(
+              title: _titleController.text,
+              startDateTime: ref.read(dateTimeStartProvider),
+              endDateTime: ref.read(dateTimeEndProvider),
+              isAllDay: ref.read(allDayEventProvider),
+              comments: _commentsController.text,
+              );
+
              // 新しいイベントを作成
               final currentList = ref.read(eventListProvider);
               final newId = currentList.isNotEmpty ? currentList.last.id + 1 : 1; // 新しいIDを生成
-              final newEvent = Event(
+              final newEvent = EVENTS(
                    id: newId, // 新しいIDをイベントに割り当て
                    title: _titleController.text, // タイトル
                    startDateTime: ref.read(dateTimeStartProvider), // 開始時間
