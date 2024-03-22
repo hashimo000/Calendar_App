@@ -39,6 +39,23 @@ void goToToday() {
 }
 
 class CalendarPage extends ConsumerWidget {
+  // CalendarPage ウィジェット内でイベントデータを取得
+// 選択された日付をパラメータに追加
+Future<List<Event>> _fetchEvents(WidgetRef ref, DateTime selectedDate) async {
+  final database = ref.read(appDatabaseProvider); // データベースインスタンスを取得
+  final events = await database.allEvents; // すべてのイベントを取得
+  
+  // 選択された日付に合致するイベントのみをフィルタリング
+  final eventsForSelectedDay = events.where((event) {
+    final startDay = DateTime(event.startDateTime.year, event.startDateTime.month, event.startDateTime.day);
+    final endDay = DateTime(event.endDateTime.year, event.endDateTime.month, event.endDateTime.day);
+    return selectedDate.isAtSameMomentAs(startDay) || 
+           (selectedDate.isAfter(startDay) && selectedDate.isBefore(endDay)) || 
+           selectedDate.isAtSameMomentAs(endDay);
+  }).toList();
+
+  return eventsForSelectedDay;
+}
   final DateTime firstDayOfMonth;
    final Function goToToday;
      final Function(DateTime) goToSelectedMonth; // この行を追加
@@ -98,15 +115,18 @@ BoxDecoration? boxDecoration;
         showDialog(
   context: context,
   builder: (BuildContext context) {
-    // 保存されたイベントリストを取得
-    final eventList = ref.watch(eventListProvider);
-    // 選択された日付に対応するイベントだけをフィルタリング
-    final eventsForSelectedDay = eventList.where((event) {
-      final startDay = DateTime(event.startDateTime.year, event.startDateTime.month, event.startDateTime.day);
-      final endDay = DateTime(event.endDateTime.year, event.endDateTime.month, event.endDateTime.day);
-      return date.isAtSameMomentAs(startDay) || (date.isAfter(startDay) && date.isBefore(endDay)) || date.isAtSameMomentAs(endDay);
-    }).toList();
-
+   
+    return FutureBuilder<List<Event>>(
+    future: _fetchEvents(ref,date), // データベースからイベントデータを取得
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return CircularProgressIndicator(); // データ取得中はローディング表示
+      } else if (snapshot.hasError) {
+        return Text('エラーが発生しました');
+      } else if (snapshot.hasData) {
+        // データが取得できた場合、イベントデータを表示するUIを構築
+        final events = snapshot.data!;
+        // ここで events を使用してイベントリストを表示するロジックを追加
     return AlertDialog(
       backgroundColor: Colors.white,
       title: Row(
@@ -128,9 +148,9 @@ BoxDecoration? boxDecoration;
         width: 400,
         height: 500,
         child: ListView.builder(
-  itemCount: eventsForSelectedDay.length,
+  itemCount: events.length,
   itemBuilder: (context, index) {
-    final event = eventsForSelectedDay[index];
+    final event = events[index];
     return Card(
       margin: EdgeInsets.all(8), // カードの周りのマージンを設定
       child: ListTile(
@@ -183,6 +203,11 @@ BoxDecoration? boxDecoration;
           },
         ),
       ],
+    );
+      }else {
+        return Text('データがありません');
+      }
+    }
     );
   },
         );
