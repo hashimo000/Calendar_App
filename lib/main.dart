@@ -2,31 +2,37 @@ import 'package:flutter/material.dart';
 import 'package:calendar/Calendar/calendar.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
-void main() {
-  runApp(const ProviderScope(child: MyApp()),);
+import 'package:calendar/database.dart';
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  final database = AppDatabase(openConnection());
+  runApp(ProviderScope(child: MyApp(database: database)));
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+  final AppDatabase database;
 
- @override
-Widget build(BuildContext context) {
-  return MaterialApp(
-    localizationsDelegates: [
-    GlobalMaterialLocalizations.delegate,
-    GlobalWidgetsLocalizations.delegate, // Ensure this is spelled correctly
-    GlobalCupertinoLocalizations.delegate,
+  const MyApp({super.key, required this.database});
+
+  @override
+  Widget build(BuildContext context) {
+    return MaterialApp(
+      localizationsDelegates: [
+        GlobalMaterialLocalizations.delegate,
+        GlobalWidgetsLocalizations.delegate,
+        GlobalCupertinoLocalizations.delegate,
       ],
       supportedLocales: [
         const Locale('ja'),
       ],
-         locale: Locale('ja'),
-    home: Scaffold(
-      appBar: AppBar(
-        title: Text('カレンダービュー'),
-        backgroundColor: Colors.blueAccent,
+      locale: Locale('ja'),
+      home: Scaffold(
+        appBar: AppBar(
+          title: Text('カレンダービュー'),
+          backgroundColor: Colors.blueAccent,
+        ),
+        body: CalendarView(database: database),
       ),
-      body: CalendarView(),
-    ),
-  );
-}}
+    );
+  }
+}
