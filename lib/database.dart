@@ -28,6 +28,10 @@ class AppDatabase extends _$AppDatabase {
   Future<Event?> getEventById(int id) async {
   return (select(events)..where((tbl) => tbl.id.equals(id))).getSingleOrNull();
 }
+Future<int> deleteEventById(int id) async {
+  return (delete(events)..where((t) => t.id.equals(id))).go();
+}
+
 
   Stream<List<Event>> watchEvents() {
     return (select(events)).watch();

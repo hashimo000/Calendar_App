@@ -161,8 +161,12 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
     ),
   );
 }
-void _deleteEvent() {
+void _deleteEvent()async{
+   final database = ref.read(appDatabaseProvider);
+      await database.deleteEventById(widget.eventId);
+
     ref.read(eventListProvider.notifier).update((state) {
+      
       return state.where((event) => event.id != widget.eventId).toList();
     });
     Navigator.of(context).pop(); // ダイアログを閉じる
