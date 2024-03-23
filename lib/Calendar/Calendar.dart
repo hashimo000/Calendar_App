@@ -95,6 +95,13 @@ for (int i = 1; i <= lastDay; i++) {
   if (holidayData.containsKey(dateString)) {
     textColor = Colors.red;
   }
+  // 土曜日、日曜日、または祝日かどうかを確認して色を色を決める
+Color titleColor = Colors.black; // デフォルトの色
+if (date.weekday == DateTime.sunday || holidayData.containsKey(DateFormat('yyyy-MM-dd').format(date))) {
+  titleColor = Colors.red; // 日曜日または祝日の場合は赤色
+} else if (date.weekday == DateTime.saturday) {
+  titleColor = Colors.blue; // 土曜日の場合は青色
+}
 BoxDecoration? boxDecoration;
   if (DateTime.now().year == date.year && DateTime.now().month == date.month && DateTime.now().day == date.day) {
     // 本日の日付に対するデザイン
@@ -132,7 +139,10 @@ BoxDecoration? boxDecoration;
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween, 
         children: [
-          Text(dateStringTitle),
+           Text(
+        dateStringTitle,
+        style: TextStyle(color: titleColor), // ここで色を設定
+      ),
           IconButton(
             icon: Icon(Icons.add),
             color: Colors.blue,    
@@ -211,7 +221,10 @@ BoxDecoration? boxDecoration;
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween, 
         children: [
-          Text(dateStringTitle),
+          Text(
+        dateStringTitle,
+        style: TextStyle(color: titleColor), // ここで色を設定
+      ),
           IconButton(
             icon: Icon(Icons.add),
             color: Colors.blue,    
