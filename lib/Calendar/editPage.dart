@@ -18,6 +18,8 @@ class EditPage extends ConsumerStatefulWidget {
 }
 
 class _EditPageState extends ConsumerState<EditPage> {
+   // 初期化が完了したかどうかを追跡するためのブールフラグを追加
+  bool _isInitialized = false;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _commentsController = TextEditingController();
   late String _initialTitle;
@@ -29,43 +31,63 @@ class _EditPageState extends ConsumerState<EditPage> {
 
 
 @override
-void initState() {
+
+ void initState() {
   super.initState();
+  _titleController.addListener(_onTextChanged);
+  _commentsController.addListener(_onTextChanged);
   WidgetsBinding.instance.addPostFrameCallback((_) async {
-  final database = ref.read(appDatabaseProvider);
-  final Event? event = await database.getEventById(widget.eventId); // eventはnull許容型
+    final database = ref.read(appDatabaseProvider);
+    final Event? event = await database.getEventById(widget.eventId);
 
-  if (event != null) { // eventがnullでないことを確認
-    _titleController.text = event.title; // null許容ではないため、nullチェック後は安全にアクセスできる
-    _commentsController.text = event.comments ?? ''; // event.commentsがnullなら空文字を代入
-    _initialTitle = event.title; // 同上
-    _initialComments = event.comments ?? ''; // event.commentsがnullなら空文字を代入
-    _initialStartDateTime = event.startDateTime; // null許容ではないため、nullチェック後は安全にアクセスできる
-    _initialEndDateTime = event.endDateTime; // 同上
-    _initialIsAllDay = event.isAllDay; // null許容ではないため、nullチェック後は安全にアクセスできる
-    _event = event; // 読み込んだイベントデータをメンバ変数に保存
-  }
-});
+    if (event != null) {
+      setState(() {
+        // イベントデータでUIを初期化
+        _titleController.text = event.title;
+        _commentsController.text = event.comments ?? '';
+        _initialTitle = event.title;
+        _initialComments = event.comments ?? '';
+        _initialStartDateTime = event.startDateTime;
+        _initialEndDateTime = event.endDateTime;
+        _initialIsAllDay = event.isAllDay;
+        _event = event;
+        _isInitialized = true;
+      });
 
+      // 初期データでプロバイダーも更新
+      ref.read(dateTimeStartProvider.notifier).state = _initialStartDateTime;
+      ref.read(dateTimeEndProvider.notifier).state = _initialEndDateTime;
+      ref.read(allDayEventProvider.notifier).state = _initialIsAllDay;
+    }
+  });
+}
+void _onTextChanged() {
+  // 状態の更新が必要な場合にはここで行う
+  setState(() {});
 }
 
-
   @override
-  void dispose() {
-    _titleController.dispose();
-    _commentsController.dispose();
-    super.dispose();
-  }
-  bool _isEdited() {
-   final currentStartDateTime = ref.read(dateTimeStartProvider);
-    final currentEndDateTime = ref.read(dateTimeEndProvider);
-    final currentIsAllDay = ref.watch(allDayEventProvider);
-    return _titleController.text != _initialTitle ||
-           _commentsController.text != _initialComments ||
-           currentStartDateTime != _initialStartDateTime ||
-           currentEndDateTime != _initialEndDateTime ||
-           currentIsAllDay != _initialIsAllDay;
-  }
+void dispose() {
+  _titleController.removeListener(_onTextChanged);
+  _commentsController.removeListener(_onTextChanged);
+  _titleController.dispose();
+  _commentsController.dispose();
+  super.dispose();
+}
+bool _isEdited(WidgetRef ref) {
+  final currentTitle = _titleController.text;
+  final currentComments = _commentsController.text;
+  final currentStartDateTime = ref.read(dateTimeStartProvider);
+  final currentEndDateTime = ref.read(dateTimeEndProvider);
+  final currentIsAllDay = ref.read(allDayEventProvider);
+
+  return currentTitle != _initialTitle ||
+         currentComments != _initialComments ||
+         currentStartDateTime != _initialStartDateTime ||
+         currentEndDateTime != _initialEndDateTime ||
+         currentIsAllDay != _initialIsAllDay;
+}
+
 void _showActionSheet() {
     showModalBottomSheet(
       context: context,
@@ -206,7 +228,13 @@ void _showDeleteConfirmationDialog() {
 
     final isAllDay = ref.watch(allDayEventProvider);
     final dateFormat = isAllDay ? 'yyyy-MM-dd' : 'yyyy-MM-dd kk:mm';
-
+       if (!_isInitialized) {
+      return Scaffold(
+        body: Center(
+          child: CircularProgressIndicator(),
+        ),
+      );
+    }
     return Scaffold(
       appBar: AppBar(
         title: const Text('予定の編集'),
@@ -214,7 +242,7 @@ void _showDeleteConfirmationDialog() {
         leading: IconButton(
           icon: const Icon(Icons.close), // ×アイコンを設定
            onPressed: () {
-            if (_isEdited()) {
+            if (_isEdited(ref)) {
               _showActionSheet();
             } else {
               Navigator.pop(context);
@@ -223,7 +251,7 @@ void _showDeleteConfirmationDialog() {
         ),
         actions: <Widget>[
           OutlinedButton(
-             onPressed: () async{
+             onPressed: _isEdited(ref) ? () async{
               
                         // 入力されたデータを取得
              final enteredTitle = _titleController.text;
@@ -241,7 +269,6 @@ void _showDeleteConfirmationDialog() {
     endDateTime: ref.read(dateTimeEndProvider),
     isAllDay: ref.read(allDayEventProvider),
   );
-              
               ref.read(eventListProvider.notifier).update((state) {
                 return state.map((event) {
                   if (event.id == eventId) {
@@ -259,13 +286,21 @@ void _showDeleteConfirmationDialog() {
               });
 
               Navigator.pop(context);
-            },
-             style: OutlinedButton.styleFrom(
-    shape: RoundedRectangleBorder(
-      borderRadius: BorderRadius.circular(16),
-      
+            }: null, // isEditedがfalseの場合、ボタンは非活性化される。
+            style:  ButtonStyle(
+    backgroundColor: MaterialStateProperty.resolveWith<Color>(
+      (Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return Colors.grey; // ボタン非活性時の背景色
+        }
+        return Colors.white; // デフォルトの背景色
+      },
     ),
-    backgroundColor: Colors.white,
+    shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+      RoundedRectangleBorder(
+        borderRadius: BorderRadius.circular(16),
+      ),
+    ),
   ),
             child: const 
             Text('保存',
