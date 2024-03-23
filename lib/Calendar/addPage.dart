@@ -169,6 +169,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
           OutlinedButton(
             onPressed: _titleController.text.isNotEmpty && _commentsController.text.isNotEmpty 
             ?  ()async {
+              
               final database = ref.read(appDatabaseProvider);
              // データベースにイベントを追加
               await database.addEvent(
@@ -205,7 +206,9 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
     ref.read(eventCommentsProvider.notifier).state = enteredComments; // TextFieldから入力されたコメント;
     ref.read(eventDateTimeStartProvider.notifier).state = startDateTime; // DateTimePickerから選択された日時;
     ref.read(eventDateTimeEndProvider.notifier).state = endDateTime;
-    Navigator.pop(context); // ポップアップを閉じる
+    
+    Navigator.pop(context); 
+     Navigator.pop(context);// ポップアップを閉じる
             }
          :null ,
             

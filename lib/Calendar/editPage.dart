@@ -210,7 +210,9 @@ void _showDeleteConfirmationDialog() {
           TextButton(
             onPressed: () {
               _deleteEvent();
-              Navigator.of(context).pop(); // ダイアログを閉じ、削除処理を実行
+              Navigator.of(context).pop();
+              Navigator.of(context).pop();
+               // ダイアログを閉じ、削除処理を実行
             },
             child: Text('削除'),
           ),
@@ -286,6 +288,7 @@ void _showDeleteConfirmationDialog() {
               });
 
               Navigator.pop(context);
+               Navigator.pop(context);
             }: null, // isEditedがfalseの場合、ボタンは非活性化される。
             style:  ButtonStyle(
     backgroundColor: MaterialStateProperty.resolveWith<Color>(
