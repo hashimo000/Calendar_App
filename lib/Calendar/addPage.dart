@@ -4,7 +4,7 @@ import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:calendar/database.dart';
 final dateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
-final dateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now());
+final dateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now().add(Duration(hours: 1)));
 final allDayEventProvider = StateProvider<bool>((ref) => false); 
 // イベントタイトルと日時を保持するプロバイダー
 final eventTitleProvider = StateProvider<String>((ref) => '');
@@ -77,7 +77,7 @@ class _AddPageState extends ConsumerState<AddPage> {
     // 状態プロバイダーをリセット
     ref.read(allDayEventProvider.notifier).state = false;
     ref.read(dateTimeStartProvider.notifier).state = DateTime.now();
-    ref.read(dateTimeEndProvider.notifier).state = DateTime.now();
+    ref.read(dateTimeEndProvider.notifier).state = DateTime.now().add(Duration(hours: 1));
   }
 
 
@@ -118,7 +118,9 @@ void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
 
 void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
    final isAllDay = ref.watch(allDayEventProvider);
-  
+  final now = DateTime.now();
+final initialDateTime = DateTime(now.year, now.month, now.day, now.hour).add(Duration(hours: 1));
+
   
   showCupertinoModalPopup(
     context: context,
@@ -132,7 +134,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
             
             child: CupertinoDatePicker(
               
-              initialDateTime:  DateTime(now.year, now.month, now.day, ),
+              initialDateTime:  initialDateTime,
               mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
               onDateTimeChanged: (DateTime newDate) {
                 ref.read(dateTimeEndProvider.notifier).update((state) => newDate);
