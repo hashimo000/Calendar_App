@@ -82,10 +82,7 @@ class _AddPageState extends ConsumerState<AddPage> {
 
 
 void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
-  
   final isAllDay = ref.watch(allDayEventProvider);
-  
-  
   showCupertinoModalPopup(
     context: context,
     builder: (_) => Container(
@@ -95,33 +92,34 @@ void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
         children: [
           Container(
             height: 200,
-            
             child: CupertinoDatePicker(
-              
-              initialDateTime:  DateTime(now.year, now.month, now.day, ),
+              initialDateTime: DateTime(now.year, now.month, now.day),
               mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
               onDateTimeChanged: (DateTime newDate) {
-                ref.read(dateTimeStartProvider.notifier).update((state) => newDate);
+                // 選択された新しい開始時間を現在の終了時間と比較
+                final currentEnd = ref.read(dateTimeEndProvider);
+                if (newDate.isAfter(currentEnd)) {
+                  // 開始時間が終了時間よりも後の場合は、終了時間を開始時間+1時間に設定
+                  final newEnd = newDate.add(Duration(hours: 1));
+                  ref.read(dateTimeEndProvider.notifier).state = newEnd;
+                }
+                ref.read(dateTimeStartProvider.notifier).state = newDate;
               },
               minimumDate: DateTime(2022, 5, 5),
               maximumDate: DateTime(2030, 6, 7),
               minuteInterval: 15,
             ),
           ),
-          
         ],
       ),
     ),
   );
-   
 }
 
 void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
-   final isAllDay = ref.watch(allDayEventProvider);
-  final now = DateTime.now();
-final initialDateTime = DateTime(now.year, now.month, now.day, now.hour).add(Duration(hours: 1));
+  final isAllDay = ref.watch(allDayEventProvider);
+  final currentStart = ref.read(dateTimeStartProvider);
 
-  
   showCupertinoModalPopup(
     context: context,
     builder: (_) => Container(
@@ -131,26 +129,24 @@ final initialDateTime = DateTime(now.year, now.month, now.day, now.hour).add(Dur
         children: [
           Container(
             height: 200,
-            
             child: CupertinoDatePicker(
-              
-              initialDateTime:  initialDateTime,
+              initialDateTime: currentStart.add(Duration(hours: 1)), 
               mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
               onDateTimeChanged: (DateTime newDate) {
-                ref.read(dateTimeEndProvider.notifier).update((state) => newDate);
+                // 選択された新しい終了時間を設定
+                ref.read(dateTimeEndProvider.notifier).state = newDate;
               },
-              minimumDate: DateTime(2022, 5, 5),
+              minimumDate: currentStart, // 選択できる最小日時を開始時間に設定
               maximumDate: DateTime(2030, 6, 7),
               minuteInterval: 15,
             ),
           ),
-          
         ],
       ),
     ),
   );
-   
 }
+
 
   @override
   Widget build(BuildContext context) {
