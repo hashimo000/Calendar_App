@@ -123,6 +123,11 @@ void _showActionSheet() {
   }
 void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
+  DateTime now = DateTime.now();
+  // 分をminuteIntervalで割り切れるように調整
+  int correctedMinute = ((now.minute + 7) ~/ 15) * 15 % 60;
+  DateTime initialDateTime = DateTime(now.year, now.month, now.day, now.hour, correctedMinute);
+
   showCupertinoModalPopup(
     context: context,
     builder: (_) => Container(
@@ -132,29 +137,30 @@ void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
         children: [
           Container(
             height: 200,
-            
             child: CupertinoDatePicker(
-              
-              initialDateTime:  DateTime(now.year, now.month, now.day, ),
+              initialDateTime: initialDateTime, 
               mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
               onDateTimeChanged: (DateTime newDate) {
-                ref.read(dateTimeStartProvider.notifier).update((state) => newDate);
+                ref.read(dateTimeStartProvider.notifier).state = newDate;
               },
-              minimumDate: DateTime(2022, 5, 5),
-              maximumDate: DateTime(2030, 6, 7),
+              minimumDate: DateTime(now.year, now.month, now.day),
               minuteInterval: 15,
             ),
           ),
-          
         ],
       ),
     ),
   );
-   
 }
 
 void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
+  final currentStartDateTime = ref.read(dateTimeStartProvider);
+  DateTime minimumDate = currentStartDateTime.add(Duration(hours: 1));
+  // 分をminuteIntervalで割り切れるように調整
+  int correctedMinute = ((minimumDate.minute + 7) ~/ 15) * 15 % 60;
+  DateTime initialDateTime = DateTime(minimumDate.year, minimumDate.month, minimumDate.day, minimumDate.hour, correctedMinute);
+
   showCupertinoModalPopup(
     context: context,
     builder: (_) => Container(
@@ -164,20 +170,16 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
         children: [
           Container(
             height: 200,
-            
             child: CupertinoDatePicker(
-              
-              initialDateTime:  DateTime(now.year, now.month, now.day, ),
+              initialDateTime: initialDateTime, 
               mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
               onDateTimeChanged: (DateTime newDate) {
-                ref.read(dateTimeEndProvider.notifier).update((state) => newDate);
+                ref.read(dateTimeEndProvider.notifier).state = newDate;
               },
-              minimumDate: DateTime(2022, 5, 5),
-              maximumDate: DateTime(2030, 6, 7),
+              minimumDate: minimumDate,
               minuteInterval: 15,
             ),
           ),
-          
         ],
       ),
     ),
