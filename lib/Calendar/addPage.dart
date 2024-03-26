@@ -120,6 +120,23 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
   final currentStart = ref.read(dateTimeStartProvider);
 
+  // 現在の開始時刻から1時間後の時刻を計算
+  final oneHourLater = currentStart.add(Duration(hours: 1));
+
+  // 分を15で割り、結果を切り上げてから15を掛けて、15分単位に丸める
+  final roundedMinutes = (oneHourLater.minute / 15).ceil() * 15;
+  DateTime roundedOneHourLater;
+
+  // 分が60以上の場合は、時間を1つ進めて分を0にする
+  if (roundedMinutes >= 60) {
+    roundedOneHourLater = DateTime(oneHourLater.year, oneHourLater.month, oneHourLater.day, oneHourLater.hour + 1, 0);
+  } else {
+    roundedOneHourLater = DateTime(oneHourLater.year, oneHourLater.month, oneHourLater.day, oneHourLater.hour, roundedMinutes);
+  }
+
+  // 開始時間より後の時刻かどうかを判定し、条件に応じて初期値と最小日時を設定
+  final initialAndMinimumDateTime = roundedOneHourLater.isAfter(currentStart) ? roundedOneHourLater : currentStart.add(Duration(hours: 1));
+
   showCupertinoModalPopup(
     context: context,
     builder: (_) => Container(
@@ -130,13 +147,12 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
           Container(
             height: 200,
             child: CupertinoDatePicker(
-              initialDateTime: currentStart.add(Duration(hours: 1)), 
+              initialDateTime: initialAndMinimumDateTime,
               mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
               onDateTimeChanged: (DateTime newDate) {
-                // 選択された新しい終了時間を設定
                 ref.read(dateTimeEndProvider.notifier).state = newDate;
               },
-              minimumDate: currentStart, // 選択できる最小日時を開始時間に設定
+              minimumDate: initialAndMinimumDateTime,
               maximumDate: DateTime(2030, 6, 7),
               minuteInterval: 15,
             ),
@@ -146,6 +162,8 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
     ),
   );
 }
+
+
 
 
   @override
