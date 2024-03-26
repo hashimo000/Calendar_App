@@ -124,67 +124,71 @@ void _showActionSheet() {
 void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
   DateTime now = DateTime.now();
-  // 分をminuteIntervalで割り切れるように調整
-  int correctedMinute = ((now.minute + 7) ~/ 15) * 15 % 60;
-  DateTime initialDateTime = DateTime(now.year, now.month, now.day, now.hour, correctedMinute);
+  DateTime initialDateTime = ref.read(dateTimeStartProvider);
+
+  // 現在の分が15分単位になっていない場合に調整
+  int adjustment = (15 - initialDateTime.minute % 15) % 15;
+  DateTime adjustedInitialDateTime = initialDateTime.add(Duration(minutes: adjustment));
+
+  DateTime minimumDate = DateTime(now.year, now.month, now.day); // 過去の日付を選択不可にする
 
   showCupertinoModalPopup(
     context: context,
     builder: (_) => Container(
       height: 250,
       color: Colors.white,
-      child: Column(
-        children: [
-          Container(
-            height: 200,
-            child: CupertinoDatePicker(
-              initialDateTime: initialDateTime, 
-              mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
-              onDateTimeChanged: (DateTime newDate) {
-                ref.read(dateTimeStartProvider.notifier).state = newDate;
-              },
-              minimumDate: DateTime(now.year, now.month, now.day),
-              minuteInterval: 15,
-            ),
-          ),
-        ],
+      child: CupertinoDatePicker(
+        initialDateTime: adjustedInitialDateTime, // 調整済みの初期日時を使用
+        mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
+        onDateTimeChanged: (DateTime newDate) {
+          ref.read(dateTimeStartProvider.notifier).state = newDate;
+          // 終了時間を開始時間の少なくとも1時間後に保証する
+          final currentEnd = ref.read(dateTimeEndProvider);
+          if (currentEnd.isBefore(newDate.add(Duration(hours: 1)))) {
+            ref.read(dateTimeEndProvider.notifier).state = newDate.add(Duration(hours: 1));
+          }
+        },
+        minimumDate: minimumDate,
+        minuteInterval: 15,
       ),
     ),
   );
 }
+
 
 void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
   final currentStartDateTime = ref.read(dateTimeStartProvider);
-  DateTime minimumDate = currentStartDateTime.add(Duration(hours: 1));
-  // 分をminuteIntervalで割り切れるように調整
-  int correctedMinute = ((minimumDate.minute + 7) ~/ 15) * 15 % 60;
-  DateTime initialDateTime = DateTime(minimumDate.year, minimumDate.month, minimumDate.day, minimumDate.hour, correctedMinute);
+  DateTime oneHourAdded = currentStartDateTime.add(Duration(hours: 1));
+
+  // 分が15分単位になるように調整
+  int minutes = oneHourAdded.minute;
+  int adjustment = (15 - minutes % 15) % 15;
+  DateTime adjustedDateTime = oneHourAdded.add(Duration(minutes: adjustment));
+
+  DateTime initialDateTime = adjustedDateTime;
+  DateTime minimumDate = adjustedDateTime;
 
   showCupertinoModalPopup(
     context: context,
     builder: (_) => Container(
       height: 250,
       color: Colors.white,
-      child: Column(
-        children: [
-          Container(
-            height: 200,
-            child: CupertinoDatePicker(
-              initialDateTime: initialDateTime, 
-              mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
-              onDateTimeChanged: (DateTime newDate) {
-                ref.read(dateTimeEndProvider.notifier).state = newDate;
-              },
-              minimumDate: minimumDate,
-              minuteInterval: 15,
-            ),
-          ),
-        ],
+      child: CupertinoDatePicker(
+        initialDateTime: initialDateTime,
+        mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
+        onDateTimeChanged: (DateTime newDate) {
+          ref.read(dateTimeEndProvider.notifier).state = newDate;
+        },
+        minimumDate: minimumDate,
+        minuteInterval: 15,
       ),
     ),
   );
 }
+
+
+
 void _deleteEvent()async{
    final database = ref.read(appDatabaseProvider);
       await database.deleteEventById(widget.eventId);
