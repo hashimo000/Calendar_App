@@ -5,6 +5,7 @@ import 'package:calendar/Calendar/holiday.dart';
 import 'package:calendar/Calendar/addPage.dart';
 import 'package:calendar/Calendar/editPage.dart';
 import 'package:calendar/database.dart';
+
 class CalendarView extends ConsumerWidget {
   final PageController _pageController = PageController(initialPage: 5000);
   void goToSelectedMonth(DateTime selectedDate) {
@@ -21,18 +22,51 @@ void goToToday() {
   int pageIndex = 5000 + monthsDifference;
   _pageController.jumpToPage(pageIndex);
 }
+Future<List<DateTime>> fetchEventsDates(WidgetRef ref) async {
+  final database = ref.read(appDatabaseProvider);
+  final events = await database.allEvents; // すべてのイベントを取得
+  List<DateTime> eventDates = [];
+  for (var event in events) {
+    // イベントの開始日をリストに追加
+    DateTime startDate = DateTime(event.startDateTime.year, event.startDateTime.month, event.startDateTime.day);
+    print("イベント開始日: $startDate"); // ここでログ出力
+    eventDates.add(startDate);
+  }
+  return eventDates;
+}
 
   CalendarView({Key? key ,required this.database}) : super(key: key);
   final AppDatabase database;
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    return PageView.builder(
-      itemCount: 10000, // 必要に応じて適切な数値を設定
-      controller: _pageController,
-      itemBuilder: (context, index) {
-        DateTime now = DateTime.now();
-        DateTime firstOfMonth = DateTime(now.year, now.month + index - 5000, 1);
-        return CalendarPage(key: ValueKey(firstOfMonth),firstDayOfMonth: firstOfMonth,goToToday: goToToday,goToSelectedMonth: goToSelectedMonth, );
+    // ページビルダーの中で、fetchEventsDatesを呼び出して、
+    // 結果をCalendarPageに渡すようなロジックを追加するかもしれません。
+    // 例えば、FutureBuilderを使用するなど。
+
+    // CalendarPageのコンストラクタにイベントの日付リストを渡します。
+    return FutureBuilder<List<DateTime>>(
+      future: fetchEventsDates(ref),
+      builder: (context, snapshot) {
+        if (snapshot.connectionState == ConnectionState.done && snapshot.hasData) {
+          return PageView.builder(
+            itemCount: 10000,
+            controller: _pageController,
+            itemBuilder: (context, index) {
+              DateTime now = DateTime.now();
+              DateTime firstOfMonth = DateTime(now.year, now.month + index - 5000, 1);
+              // イベントの日付リストをCalendarPageに渡す
+              return CalendarPage(
+                key: ValueKey(firstOfMonth),
+                firstDayOfMonth: firstOfMonth,
+                goToToday: goToToday,
+                goToSelectedMonth: goToSelectedMonth,
+                eventsDates: snapshot.data!,
+              );
+            },
+          );
+        } else {
+          return Center(child: CircularProgressIndicator());
+        }
       },
     );
   }
@@ -58,8 +92,9 @@ Future<List<Event>> _fetchEvents(WidgetRef ref, DateTime selectedDate) async {
 }
   final DateTime firstDayOfMonth;
    final Function goToToday;
-     final Function(DateTime) goToSelectedMonth; // この行を追加
-  const CalendarPage({Key? key, required this.firstDayOfMonth,required this.goToToday,required this.goToSelectedMonth}) : super(key: key);
+     final Function(DateTime) goToSelectedMonth; 
+      final List<DateTime> eventsDates;
+  const CalendarPage({Key? key, required this.firstDayOfMonth,required this.goToToday,required this.goToSelectedMonth,this.eventsDates = const [],}) : super(key: key);
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -69,11 +104,10 @@ Future<List<Event>> _fetchEvents(WidgetRef ref, DateTime selectedDate) async {
     // 月の最初の日が何曜日かを取得(1: 月曜日, 7: 日曜日)
     int weekDayOfFirstDay = firstDayOfMonth.weekday;
     int lastDay = DateTime(firstDayOfMonth.year, firstDayOfMonth.month + 1, 0).day;
-
     // カレンダーの日付ウィジェットを生成
     List<Widget> getDayWidgets() {
       List<Widget> dayWidgets = [];
-      
+     
       // 月の最初の日の曜日に応じて空のボックスを追加する。最初の日が水曜日の場合、月曜日と火曜日のボックスを追加
       for (int i = 0; i < weekDayOfFirstDay-1; i++) {
         dayWidgets.add(Container());
@@ -83,6 +117,16 @@ for (int i = 1; i <= lastDay; i++) {
   DateTime date = DateTime(firstDayOfMonth.year, firstDayOfMonth.month, i);
   String dateString = DateFormat('yyyy-MM-dd').format(date);
   Color textColor = Colors.black; // デフォルトのテキスト色
+ // カレンダーの日付ウィジェットを生成する部分
+  // イベントがあるかどうかを確認
+bool hasEvent = eventsDates.any((eventDate) =>
+  eventDate.year == date.year &&
+  eventDate.month == date.month &&
+  eventDate.day == date.day);
+  
+print("日付: $date, イベント有無: $hasEvent"); // ここでログ出力
+
+// その他のウィジェット構築ロジック...
 
   // 土曜日は青色、日曜日は赤色
   if (date.weekday == DateTime.sunday) {
@@ -251,18 +295,34 @@ BoxDecoration? boxDecoration;
         );
       },
       child: Container(
-        width: 10, // 丸の幅を設定
-        height: 10, // 丸の高さを設定
-        alignment: Alignment.center, // テキストを中央に配置
-        decoration: boxDecoration, 
-        child: Text(
-          '$i',
-          textAlign: TextAlign.center,
-          style: TextStyle(color: textColor,fontSize: 14),
-          
-        ),
+  width: 10,
+  height: 10,
+  alignment: Alignment.center,
+  decoration: boxDecoration,
+  child: Stack(
+    alignment: Alignment.center,
+    children: <Widget>[
+      Text('$i', style: TextStyle(color: textColor, fontSize: 14)),
+      if (hasEvent) // 条件付きでウィジェットを表示
+  Positioned(
+    right: 4, // 位置調整
+    top: 4, // 位置調整
+    child: Container(
+      width: 8, // サイズを大きくする
+      height: 8, // サイズを大きくする
+      decoration: BoxDecoration(
+        shape: BoxShape.circle,
+        color: Colors.black,
       ),
-    ));
+    ),
+  ),
+
+    ],
+  ),
+)
+
+            ),
+    );
   }
       return dayWidgets;
     }
