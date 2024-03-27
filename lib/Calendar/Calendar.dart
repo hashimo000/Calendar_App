@@ -295,8 +295,6 @@ BoxDecoration? boxDecoration;
         );
       },
       child: Container(
-  width: 10,
-  height: 10,
   alignment: Alignment.center,
   decoration: boxDecoration,
   child: Stack(
@@ -305,17 +303,17 @@ BoxDecoration? boxDecoration;
       Text('$i', style: TextStyle(color: textColor, fontSize: 14)),
       if (hasEvent) // 条件付きでウィジェットを表示
   Positioned(
-    right: 4, // 位置調整
-    top: 4, // 位置調整
-    child: Container(
-      width: 8, // サイズを大きくする
-      height: 8, // サイズを大きくする
-      decoration: BoxDecoration(
-        shape: BoxShape.circle,
-        color: Colors.black,
-      ),
+  top: 16, 
+  child: Container(
+    width: 4, // サイズを大きくする
+    height:4, // サイズを大きくする
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: Colors.black,
     ),
   ),
+),
+
 
     ],
   ),
@@ -375,7 +373,7 @@ BoxDecoration? boxDecoration;
           ),
           Expanded(
             child: GridView.count(
-              crossAxisCount: 7,
+             crossAxisCount: 7,
               children: getDayWidgets(),
             ),
           ),
