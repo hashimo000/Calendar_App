@@ -22,6 +22,7 @@ void goToToday() {
   int pageIndex = 5000 + monthsDifference;
   _pageController.jumpToPage(pageIndex);
 }
+// イベントの日付リストを取得
 Future<List<DateTime>> fetchEventsDates(WidgetRef ref) async {
   final database = ref.read(appDatabaseProvider);
   final events = await database.allEvents; // すべてのイベントを取得
@@ -29,7 +30,7 @@ Future<List<DateTime>> fetchEventsDates(WidgetRef ref) async {
   for (var event in events) {
     // イベントの開始日をリストに追加
     DateTime startDate = DateTime(event.startDateTime.year, event.startDateTime.month, event.startDateTime.day);
-    print("イベント開始日: $startDate"); // ここでログ出力
+    print("イベント開始日: $startDate"); 
     eventDates.add(startDate);
   }
   return eventDates;
@@ -116,7 +117,7 @@ Future<List<Event>> _fetchEvents(WidgetRef ref, DateTime selectedDate) async {
 for (int i = 1; i <= lastDay; i++) {
   DateTime date = DateTime(firstDayOfMonth.year, firstDayOfMonth.month, i);
   String dateString = DateFormat('yyyy-MM-dd').format(date);
-  Color textColor = Colors.black; // デフォルトのテキスト色
+  Color textColor = Colors.black; // デフォルトのテキストの色
  // カレンダーの日付ウィジェットを生成する部分
   // イベントがあるかどうかを確認
 bool hasEvent = eventsDates.any((eventDate) =>
@@ -124,10 +125,7 @@ bool hasEvent = eventsDates.any((eventDate) =>
   eventDate.month == date.month &&
   eventDate.day == date.day);
   
-print("日付: $date, イベント有無: $hasEvent"); // ここでログ出力
-
-// その他のウィジェット構築ロジック...
-
+print("日付: $date, イベント有無: $hasEvent"); 
   // 土曜日は青色、日曜日は赤色
   if (date.weekday == DateTime.sunday) {
     textColor = Colors.red;
@@ -148,10 +146,10 @@ if (date.weekday == DateTime.sunday || holidayData.containsKey(DateFormat('yyyy-
 }
 BoxDecoration? boxDecoration;
   if (DateTime.now().year == date.year && DateTime.now().month == date.month && DateTime.now().day == date.day) {
-    // 本日の日付に対するデザイン
+    // 本日の日付のデザイン
     boxDecoration = BoxDecoration(
-      color: Colors.blue, // 背景色を青に設定
-      shape: BoxShape.circle, // 丸形
+      color: Colors.blue, 
+      shape: BoxShape.circle, 
       
     );
     textColor = Colors.white; // 本日のテキスト色を白に設定
@@ -171,13 +169,12 @@ BoxDecoration? boxDecoration;
     future: _fetchEvents(ref,date), // データベースからイベントデータを取得
     builder: (context, snapshot) {
       if (snapshot.connectionState == ConnectionState.waiting) {
-        return CircularProgressIndicator(); // データ取得中はローディング表示
+        return CircularProgressIndicator(); 
       } else if (snapshot.hasError) {
         return Text('エラーが発生しました');
       } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
         // データが取得でき、予定がある場合、イベントデータを表示するUIを構築
         final events = snapshot.data!;
-        // ここで events を使用してイベントリストを表示するロジックを追加
     return AlertDialog(
       backgroundColor: Colors.white,
       title: Row(
@@ -185,7 +182,7 @@ BoxDecoration? boxDecoration;
         children: [
            Text(
         dateStringTitle,
-        style: TextStyle(color: titleColor), // ここで色を設定
+        style: TextStyle(color: titleColor),
       ),
           IconButton(
             icon: Icon(Icons.add),
@@ -214,7 +211,7 @@ BoxDecoration? boxDecoration;
     event.isAllDay
         ? Text("終日", style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold))
         : Column(
-            mainAxisAlignment: MainAxisAlignment.center, // 子要素を中央揃えにする
+            mainAxisAlignment: MainAxisAlignment.center, 
             children: <Widget>[
               Text(DateFormat("HH:mm").format(event.startDateTime)),
               Text(DateFormat("HH:mm").format(event.endDateTime)),
@@ -232,7 +229,7 @@ BoxDecoration? boxDecoration;
   ],
 ),
 
-        onTap: () { // ここでGestureDetectorをListTileのonTapに変更
+        onTap: () { 
         debugPrint(event.id.toString());
         debugPrint(event.title);
         debugPrint(event.startDateTime.toString());
@@ -259,7 +256,6 @@ BoxDecoration? boxDecoration;
       ],
     );
       }else {
-    // データはあるがリストが空の場合、またはデータがまったくない場合
     return AlertDialog(
       backgroundColor: Colors.white,
       title: Row(
@@ -267,7 +263,7 @@ BoxDecoration? boxDecoration;
         children: [
           Text(
         dateStringTitle,
-        style: TextStyle(color: titleColor), // ここで色を設定
+        style: TextStyle(color: titleColor), 
       ),
           IconButton(
             icon: Icon(Icons.add),
@@ -301,7 +297,7 @@ BoxDecoration? boxDecoration;
     alignment: Alignment.center,
     children: <Widget>[
       Text('$i', style: TextStyle(color: textColor, fontSize: 14)),
-      if (hasEvent) // 条件付きでウィジェットを表示
+      if (hasEvent) 
   Positioned(
   top: 16, 
   child: Container(

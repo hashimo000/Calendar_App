@@ -6,7 +6,6 @@ import 'package:calendar/database.dart';
 final dateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final dateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now().add(Duration(hours: 1)));
 final allDayEventProvider = StateProvider<bool>((ref) => false); 
-// イベントタイトルと日時を保持するプロバイダー
 final eventTitleProvider = StateProvider<String>((ref) => '');
 final eventDateTimeStartProvider = StateProvider<DateTime>((ref) => DateTime.now());
 final eventDateTimeEndProvider = StateProvider<DateTime>((ref) => DateTime.now());
@@ -176,9 +175,9 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
         title: const Text('予定の追加'),
         backgroundColor: Colors.blueAccent,
         leading: IconButton(
-          icon: const Icon(Icons.close), // ×アイコンを設定
+          icon: const Icon(Icons.close), 
           onPressed: () {
-            Navigator.pop(context); // ボタンをタップした時、元の画面に戻る
+            Navigator.pop(context); 
           },
         ),
         actions: <Widget>[
@@ -224,7 +223,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
     ref.read(eventDateTimeEndProvider.notifier).state = endDateTime;
     
     Navigator.pop(context); 
-     Navigator.pop(context);// ポップアップを閉じる
+     Navigator.pop(context);
             }
          :null ,
             
@@ -273,7 +272,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
   title: Row(
     children: <Widget>[
       Text('開始'),
-      SizedBox(width: 8.0), // この値はお好みで調整してください
+      SizedBox(width: 8.0),
       // Consumerを使用して選択された開始時間を表示
       Consumer(
         builder: (context, ref, child) {
@@ -295,7 +294,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
   title: Row(
     children: <Widget>[
       Text('終了'),
-      SizedBox(width: 8.0), // この値はお好みで調整してください
+      SizedBox(width: 8.0), 
       // Consumerを使用して選択された開始時間を表示
       Consumer(
         builder: (context, ref, child) {
@@ -322,7 +321,6 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
                 border: const OutlineInputBorder(),
               ),
             ),
-            // 保存ボタンは AppBar の actions 内にあります
           ],
         ),
       ),

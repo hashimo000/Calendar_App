@@ -4,7 +4,6 @@ import 'package:intl/intl.dart';
 import 'package:calendar/Calendar/addPage.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:calendar/database.dart';
-// Providerの定義
 final titleProvider = StateProvider<String>((ref) => '');
 final commentsProvider = StateProvider<String>((ref) => '');
 
@@ -197,7 +196,7 @@ void _deleteEvent()async{
       
       return state.where((event) => event.id != widget.eventId).toList();
     });
-    Navigator.of(context).pop(); // ダイアログを閉じる
+    Navigator.of(context).pop(); 
   }
 void _showDeleteConfirmationDialog() {
   showDialog(
@@ -209,7 +208,7 @@ void _showDeleteConfirmationDialog() {
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); // ダイアログを閉じる
+              Navigator.of(context).pop(); 
             },
             child: Text('キャンセル'),
           ),
@@ -218,7 +217,6 @@ void _showDeleteConfirmationDialog() {
               _deleteEvent();
               Navigator.of(context).pop();
               Navigator.of(context).pop();
-               // ダイアログを閉じ、削除処理を実行
             },
             child: Text('削除'),
           ),
@@ -248,7 +246,7 @@ void _showDeleteConfirmationDialog() {
         title: const Text('予定の編集'),
         backgroundColor: Colors.blueAccent,
         leading: IconButton(
-          icon: const Icon(Icons.close), // ×アイコンを設定
+          icon: const Icon(Icons.close), 
            onPressed: () {
             if (_isEdited(ref)) {
               _showActionSheet();
@@ -261,22 +259,22 @@ void _showDeleteConfirmationDialog() {
           OutlinedButton(
              onPressed: _isEdited(ref) ? () async{
               
-                        // 入力されたデータを取得
+             // 入力されたデータを取得
              final enteredTitle = _titleController.text;
              final enteredComments = _commentsController.text;
              final startDateTime = _initialStartDateTime; // ここは実際にはユーザーが選択する値に置き換える
              final endDateTime = _initialEndDateTime; // 同上
              final isAllDay = _initialIsAllDay; // 同上
-  // データベースに保存
-  final database = ref.read(appDatabaseProvider);
-  await database.updateEvents(
-    event: _event!,
-    title: enteredTitle,
-    comments: enteredComments,
-    startDateTime: ref.read(dateTimeStartProvider),
-    endDateTime: ref.read(dateTimeEndProvider),
-    isAllDay: ref.read(allDayEventProvider),
-  );
+            // データベースに保存
+             final database = ref.read(appDatabaseProvider);
+             await database.updateEvents(
+              event: _event!,
+              title: enteredTitle,
+              comments: enteredComments,
+              startDateTime: ref.read(dateTimeStartProvider),
+              endDateTime: ref.read(dateTimeEndProvider),
+              isAllDay: ref.read(allDayEventProvider),
+               );
               ref.read(eventListProvider.notifier).update((state) {
                 return state.map((event) {
                   if (event.id == eventId) {
@@ -314,7 +312,7 @@ void _showDeleteConfirmationDialog() {
             child: const 
             Text('保存',
               style: TextStyle(
-                color: Colors.black, // アプリバーの色に合わせて文字色を白に設定
+                color: Colors.black, 
               ),
             ),
           ),
@@ -345,7 +343,7 @@ void _showDeleteConfirmationDialog() {
   title: Row(
     children: <Widget>[
       Text('開始'),
-      SizedBox(width: 8.0), // この値はお好みで調整してください
+      SizedBox(width: 8.0), 
       // Consumerを使用して選択された開始時間を表示
       Consumer(
         builder: (context, ref, child) {
@@ -367,7 +365,7 @@ void _showDeleteConfirmationDialog() {
   title: Row(
     children: <Widget>[
       Text('終了'),
-      SizedBox(width: 8.0), // この値はお好みで調整してください
+      SizedBox(width: 8.0), 
       // Consumerを使用して選択された開始時間を表示
       Consumer(
         builder: (context, ref, child) {
@@ -398,9 +396,8 @@ void _showDeleteConfirmationDialog() {
                 border: const OutlineInputBorder(),
               ),
             ),
-            // 保存ボタンは AppBar の actions 内にあります
             TextButton(
-              onPressed: _showDeleteConfirmationDialog, // 削除確認ダイアログを表示する関数を呼び出す
+              onPressed: _showDeleteConfirmationDialog, 
               child: Text('この予定を削除'),
             ),
           ],
