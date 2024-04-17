@@ -331,6 +331,7 @@ BoxDecoration? boxDecoration;
                   goToToday(); 
                 },
               child: Text('今日')),
+               Spacer(), 
               GestureDetector(
   onTap: () async {
     final DateTime? picked = await showDatePicker(
@@ -347,7 +348,8 @@ BoxDecoration? boxDecoration;
     DateFormat("yyyy年MM月").format(firstDayOfMonth),
     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
   ),
-)
+),
+ Spacer(),  Spacer(), 
             ],
           ),
           
