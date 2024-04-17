@@ -228,7 +228,6 @@ BoxDecoration? boxDecoration;
     ),
   ],
 ),
-
         onTap: () { 
         debugPrint(event.id.toString());
         debugPrint(event.title);
@@ -331,7 +330,7 @@ BoxDecoration? boxDecoration;
                 onPressed: (){
                   goToToday(); 
                 },
-              child: Text('今日に移動')),
+              child: Text('今日')),
               GestureDetector(
   onTap: () async {
     final DateTime? picked = await showDatePicker(
