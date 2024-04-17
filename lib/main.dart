@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
       locale: Locale('ja'),
       home: Scaffold(
         appBar: AppBar(
-          title: Text('カレンダービュー'),
+          title: Text('カレンダー'),
           backgroundColor: Colors.blueAccent,
         ),
         body: CalendarView(database: database),
