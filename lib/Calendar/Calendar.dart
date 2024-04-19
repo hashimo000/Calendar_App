@@ -331,7 +331,7 @@ BoxDecoration? boxDecoration;
                   goToToday(); 
                 },
               child: Text('今日')),
-               Spacer(), 
+               Spacer(), //余白を追加
               GestureDetector(
   onTap: () async {
     final DateTime? picked = await showDatePicker(
@@ -349,7 +349,7 @@ BoxDecoration? boxDecoration;
     style: const TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
   ),
 ),
- Spacer(),  Spacer(), 
+ Spacer(),  Spacer(), //余白を追加
             ],
           ),
           
