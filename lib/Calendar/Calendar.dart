@@ -358,6 +358,7 @@ BoxDecoration? boxDecoration;
               for (var i = 0; i < 7; i++)
                 Expanded(
                   child: Container(
+                    color: const Color.fromARGB(255, 228, 226, 226),  // 背景色をグレーに設定
                     padding: const EdgeInsets.all(8),
                     child: Text(
                       weekDay[i],
