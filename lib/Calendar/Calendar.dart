@@ -362,7 +362,10 @@ BoxDecoration? boxDecoration;
                     child: Text(
                       weekDay[i],
                       textAlign: TextAlign.center,
-                      style: const TextStyle(color: Colors.black87, fontWeight: FontWeight.bold),
+                      style: TextStyle(
+                        color: i == 5 ? Colors.blue : i == 6 ? Colors.red : Colors.black87,
+                        fontWeight: FontWeight.bold,
+                      ),
                     ),
                   ),
                 ),
