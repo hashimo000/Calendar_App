@@ -109,6 +109,250 @@ Future<List<Event>> _fetchEvents(WidgetRef ref, DateTime selectedDate) async {
     List<Widget> getDayWidgets() {
       List<Widget> dayWidgets = [];
      
+    // 前月の最後の日を取得
+  DateTime firstOfMonth = firstDayOfMonth;
+  DateTime lastOfPrevMonth = DateTime(firstOfMonth.year, firstOfMonth.month, 0);
+  int daysInPrevMonth = lastOfPrevMonth.day;
+
+  // 前月の日付を追加
+  for (int i = firstOfMonth.weekday - 1; i > 0; i--) {
+    dayWidgets.add(
+      Container(
+        alignment: Alignment.center,
+        child: Text(
+          "${daysInPrevMonth - i + 1}",
+          style: TextStyle(color: Colors.grey),
+        ),
+      ),
+    );
+  }
+// 現在の月の日付を追加
+
+for (int i = 1; i <= lastDay; i++) {
+  DateTime date = DateTime(firstDayOfMonth.year, firstDayOfMonth.month, i);
+  String dateString = DateFormat('yyyy-MM-dd').format(date);
+  Color textColor = Colors.black; // デフォルトのテキストの色
+ // カレンダーの日付ウィジェットを生成する部分
+  // イベントがあるかどうかを確認
+bool hasEvent = eventsDates.any((eventDate) =>
+  eventDate.year == date.year &&
+  eventDate.month == date.month &&
+  eventDate.day == date.day);
+  
+print("日付: $date, イベント有無: $hasEvent"); 
+  // 土曜日は青色、日曜日は赤色
+  if (date.weekday == DateTime.sunday) {
+    textColor = Colors.red;
+  } else if (date.weekday == DateTime.saturday) {
+    textColor = Colors.blue;
+  }
+  
+  // 祝日データがあれば赤色にする
+  if (holidayData.containsKey(dateString)) {
+    textColor = Colors.red;
+  }
+  // 土曜日、日曜日、または祝日かどうかを確認して色を色を決める
+Color titleColor = Colors.black; // デフォルトの色
+if (date.weekday == DateTime.sunday || holidayData.containsKey(DateFormat('yyyy-MM-dd').format(date))) {
+  titleColor = Colors.red; // 日曜日または祝日の場合は赤色
+} else if (date.weekday == DateTime.saturday) {
+  titleColor = Colors.blue; // 土曜日の場合は青色
+}
+BoxDecoration? boxDecoration;
+  if (DateTime.now().year == date.year && DateTime.now().month == date.month && DateTime.now().day == date.day) {
+    // 本日の日付のデザイン
+    boxDecoration = BoxDecoration(
+      color: Colors.blue, 
+      shape: BoxShape.circle, 
+      
+    );
+    textColor = Colors.white; // 本日のテキスト色を白に設定
+  }
+
+    // GestureDetectorを使用してタップ可能な日付ウィジェットを追加
+    dayWidgets.add(
+      GestureDetector(
+        onTap: () {
+          
+        
+        // タップされた日付に基づいて曜日名を取得
+      String weekDayName = weekDay[date.weekday - 1];
+      // タップされた日付を使用してタイトル文字列を生成
+      String dateStringTitle = '${date.year}/${date.month}/${date.day}(${weekDayName})';
+      // タップされた日付に対応するイベントリストを表示するダイアログを表示
+        showDialog(
+  context: context,
+  builder: (BuildContext context) {
+   
+    return FutureBuilder<List<Event>>(
+    future: _fetchEvents(ref,date), // データベースからイベントデータを取得
+    builder: (context, snapshot) {
+      if (snapshot.connectionState == ConnectionState.waiting) {
+        return CircularProgressIndicator(); 
+      } else if (snapshot.hasError) {
+        return Text('エラーが発生しました');
+      } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+        // データが取得でき、予定がある場合、イベントデータを表示するUIを構築
+        final events = snapshot.data!;
+    return AlertDialog(
+      backgroundColor: Colors.white,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+        children: [
+           Text(
+        dateStringTitle,
+        style: TextStyle(color: titleColor),
+      ),
+          IconButton(
+            icon: Icon(Icons.add),
+            color: Colors.blue,    
+            onPressed: (){
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => AddPage()),
+              );
+            }
+          )
+        ],
+      ),
+      content: Container(
+        width: 400,
+        height: 500,
+        child: ListView.builder(
+  itemCount: events.length,
+  itemBuilder: (context, index) {
+    final event = events[index];
+    return Card(
+      margin: EdgeInsets.all(8), // カードの周りのマージンを設定
+      child: ListTile(
+        title: Row(
+  crossAxisAlignment: CrossAxisAlignment.center, // 中央揃えにする
+  children: <Widget>[
+    event.isAllDay
+        ? Text("終日", style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold))
+        : Column(
+            mainAxisAlignment: MainAxisAlignment.center, 
+            children: <Widget>[
+              Text(DateFormat("HH:mm").format(event.startDateTime)),
+              Text(DateFormat("HH:mm").format(event.endDateTime)),
+            ],
+          ),
+    Container(
+      height: 24, // 線の高さ
+      width: 2, // 線の幅
+      color: Colors.blue, // 線の色
+      margin: EdgeInsets.symmetric(horizontal: 8), // 左右のマージン
+    ),
+    Expanded(
+      child: Text(event.title, style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
+    ),
+  ],
+),
+        onTap: () { 
+        debugPrint(event.id.toString());
+        debugPrint(event.title);
+        debugPrint(event.startDateTime.toString());
+        debugPrint(event.endDateTime.toString());
+        debugPrint(event.comments);
+        debugPrint(event.isAllDay.toString());
+            Navigator.of(context).push(MaterialPageRoute(
+                builder: (context) => EditPage(eventId: event.id),
+            ));
+        },
+      ),
+    );
+  },
+)
+
+      ),
+      actions: <Widget>[
+        TextButton(
+          child: Text('閉じる'),
+          onPressed: () {
+            Navigator.of(context).pop();
+          },
+        ),
+      ],
+    );
+      }else {
+    return AlertDialog(
+      backgroundColor: Colors.white,
+      title: Row(
+        mainAxisAlignment: MainAxisAlignment.spaceBetween, 
+        children: [
+          Text(
+        dateStringTitle,
+        style: TextStyle(color: titleColor), 
+      ),
+          IconButton(
+            icon: Icon(Icons.add),
+            color: Colors.blue,    
+            onPressed: (){
+              Navigator.of(context).push(
+                MaterialPageRoute(builder: (context) => AddPage()),
+              );
+            }
+          )
+        ],
+      ),
+      content: Container(
+        width: 400,
+        height: 500,
+        child:  Center(
+          child: Text('予定はありません。'),
+        )
+        )
+        );
+       }
+     }
+    );
+  },
+        );
+      },
+      child: Container(
+  alignment: Alignment.center,
+  decoration: boxDecoration,
+  child: Stack(
+    alignment: Alignment.center,
+    children: <Widget>[
+      Text('$i', style: TextStyle(color: textColor, fontSize: 14)),
+      if (hasEvent) 
+  Positioned(
+  top: 16, 
+  child: Container(
+    width: 4, // サイズを大きくする
+    height:4, // サイズを大きくする
+    decoration: BoxDecoration(
+      shape: BoxShape.circle,
+      color: Colors.black,
+    ),
+  ),
+),
+
+
+    ],
+  ),
+),
+
+)
+        
+      );
+  }
+
+
+  // 翌月の日付を埋める
+  int nextMonthDayIndex = 1;
+  while (dayWidgets.length % 7 != 0) {
+    dayWidgets.add(
+      Container(
+        alignment: Alignment.center,
+        child: Text(
+          "$nextMonthDayIndex",
+          style: TextStyle(color: Colors.grey),
+        ),
+      ),
+    );
+    nextMonthDayIndex++;
+  }
       // 月の最初の日の曜日に応じて空のボックスを追加する。最初の日が水曜日の場合、月曜日と火曜日のボックスを追加
       for (int i = 0; i < weekDayOfFirstDay-1; i++) {
         dayWidgets.add(Container());
