@@ -146,10 +146,10 @@ print("日付: $date, イベント有無: $hasEvent");
     textColor = Colors.blue;
   }
   
-  // 祝日データがあれば赤色にする
-  if (holidayData.containsKey(dateString)) {
-    textColor = Colors.red;
-  }
+  // 祝日データがあれば赤色にするが祝日は黒で良いとのこと
+  // if (holidayData.containsKey(dateString)) {
+  //   textColor = Colors.red;
+  // }
   // 土曜日、日曜日、または祝日かどうかを確認して色を色を決める
 Color titleColor = Colors.black; // デフォルトの色
 if (date.weekday == DateTime.sunday || holidayData.containsKey(DateFormat('yyyy-MM-dd').format(date))) {
