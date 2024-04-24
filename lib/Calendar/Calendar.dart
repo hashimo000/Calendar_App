@@ -129,7 +129,6 @@ Future<List<Event>> _fetchEvents(WidgetRef ref, DateTime selectedDate) async {
 
 for (int i = 1; i <= lastDay; i++) {
   DateTime date = DateTime(firstDayOfMonth.year, firstDayOfMonth.month, i);
-  String dateString = DateFormat('yyyy-MM-dd').format(date);
   Color textColor = Colors.black; // デフォルトのテキストの色
  // カレンダーの日付ウィジェットを生成する部分
   // イベントがあるかどうかを確認
