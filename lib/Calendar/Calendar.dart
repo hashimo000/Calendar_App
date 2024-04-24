@@ -309,6 +309,7 @@ BoxDecoration? boxDecoration;
       child: Container(
   alignment: Alignment.center,
   decoration: boxDecoration,
+  margin: const EdgeInsets.all(10), 
   child: Stack(
     alignment: Alignment.center,
     children: <Widget>[
