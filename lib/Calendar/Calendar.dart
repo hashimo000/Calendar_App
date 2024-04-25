@@ -197,10 +197,27 @@ BoxDecoration? boxDecoration;
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween, 
         children: [
-           Text(
-        dateStringTitle,
-        style: TextStyle(color: titleColor),
+           RichText(
+  text: TextSpan(
+    style: TextStyle(fontSize: 16, color: Colors.black), // デフォルトのスタイル
+    children: <TextSpan>[
+      TextSpan(
+        text: '${date.year}/${date.month}/${date.day}', // 日付部分
       ),
+      TextSpan(
+        text: '(${weekDayName})', // 曜日名部分
+        style: TextStyle(
+          color: date.weekday == DateTime.sunday
+            ? Colors.red  // 日曜日は赤色
+            : date.weekday == DateTime.saturday
+              ? Colors.blue  // 土曜日は青色
+              : Colors.black, // それ以外の曜日はデフォルトカラーを使用
+        ),
+      ),
+    ],
+  ),
+)
+,
           IconButton(
             icon: Icon(Icons.add),
             color: Colors.blue,    
@@ -277,10 +294,26 @@ BoxDecoration? boxDecoration;
       title: Row(
         mainAxisAlignment: MainAxisAlignment.spaceBetween, 
         children: [
-          Text(
-        dateStringTitle,
-        style: TextStyle(color: titleColor), 
+          RichText(
+  text: TextSpan(
+    style: TextStyle(fontSize: 16, color: Colors.black), // デフォルトのスタイル
+    children: <TextSpan>[
+      TextSpan(
+        text: '${date.year}/${date.month}/${date.day}', // 日付部分
       ),
+      TextSpan(
+        text: '(${weekDayName})', // 曜日名部分
+        style: TextStyle(
+          color: date.weekday == DateTime.sunday
+            ? Colors.red  // 日曜日は赤色
+            : date.weekday == DateTime.saturday
+              ? Colors.blue  // 土曜日は青色
+              : Colors.black, // それ以外の曜日はデフォルトカラーを使用
+        ),
+      ),
+    ],
+  ),
+),
           IconButton(
             icon: Icon(Icons.add),
             color: Colors.blue,    
