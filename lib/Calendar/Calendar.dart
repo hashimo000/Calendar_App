@@ -193,7 +193,7 @@ BoxDecoration? boxDecoration;
     style: TextStyle(fontSize: 20, color: Colors.black), // デフォルトのスタイル
     children: <TextSpan>[
       TextSpan(
-        text: '${date.year}/${date.month}/${date.day}(', // 日付部分
+        text: DateFormat('yyyy/MM/dd').format(date)+'(', // 日付部分
       ),
       TextSpan(
         text: '${weekDayName}', // 曜日名部分
@@ -293,7 +293,7 @@ BoxDecoration? boxDecoration;
     style: TextStyle(fontSize: 20, color: Colors.black), // デフォルトのスタイル
     children: <TextSpan>[
        TextSpan(
-        text: '${date.year}/${date.month}/${date.day}(', // 日付部分
+        text: DateFormat('yyyy/MM/dd').format(date)+'(', // 日付部分
       ),
       TextSpan(
         text: '${weekDayName}', // 曜日名部分
