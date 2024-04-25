@@ -149,13 +149,7 @@ print("日付: $date, イベント有無: $hasEvent");
   // if (holidayData.containsKey(dateString)) {
   //   textColor = Colors.red;
   // }
-  // 土曜日、日曜日、または祝日かどうかを確認して色を色を決める
-Color titleColor = Colors.black; // デフォルトの色
-if (date.weekday == DateTime.sunday || holidayData.containsKey(DateFormat('yyyy-MM-dd').format(date))) {
-  titleColor = Colors.red; // 日曜日または祝日の場合は赤色
-} else if (date.weekday == DateTime.saturday) {
-  titleColor = Colors.blue; // 土曜日の場合は青色
-}
+
 BoxDecoration? boxDecoration;
   if (DateTime.now().year == date.year && DateTime.now().month == date.month && DateTime.now().day == date.day) {
     // 本日の日付のデザイン
@@ -175,8 +169,6 @@ BoxDecoration? boxDecoration;
         
         // タップされた日付に基づいて曜日名を取得
       String weekDayName = weekDay[date.weekday - 1];
-      // タップされた日付を使用してタイトル文字列を生成
-      String dateStringTitle = '${date.year}/${date.month}/${date.day}(${weekDayName})';
       // タップされた日付に対応するイベントリストを表示するダイアログを表示
         showDialog(
   context: context,
