@@ -199,7 +199,7 @@ BoxDecoration? boxDecoration;
         children: [
            RichText(
   text: TextSpan(
-    style: TextStyle(fontSize: 16, color: Colors.black), // デフォルトのスタイル
+    style: TextStyle(fontSize: 20, color: Colors.black), // デフォルトのスタイル
     children: <TextSpan>[
       TextSpan(
         text: '${date.year}/${date.month}/${date.day}', // 日付部分
@@ -296,7 +296,7 @@ BoxDecoration? boxDecoration;
         children: [
           RichText(
   text: TextSpan(
-    style: TextStyle(fontSize: 16, color: Colors.black), // デフォルトのスタイル
+    style: TextStyle(fontSize: 20, color: Colors.black), // デフォルトのスタイル
     children: <TextSpan>[
       TextSpan(
         text: '${date.year}/${date.month}/${date.day}', // 日付部分
