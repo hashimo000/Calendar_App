@@ -45,7 +45,7 @@ Future<int> deleteEventById(int id) async {
         title: Value(title),
         startDateTime: Value(startDateTime),
         endDateTime: Value(endDateTime),
-        isAllDay: Value(false),
+        isAllDay: Value(isAllDay),
         comments: Value(comments),
       ),
     );
