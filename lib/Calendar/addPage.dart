@@ -187,6 +187,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
               
               final database = ref.read(appDatabaseProvider);
              // データベースにイベントを追加
+             print("データベースに保存する前の終日フラグ: ${ref.read(allDayEventProvider)}");
               await database.addEvent(
               title: _titleController.text,
               startDateTime: ref.read(dateTimeStartProvider),
@@ -266,6 +267,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
               value: isAllDay,
               onChanged: (bool value) {
                 ref.read(allDayEventProvider.notifier).state = value;
+                print("終日スイッチが ${value ? 'ON' : 'OFF'} に変更されました。");  // ログ出力
               },
             ),
             ListTile(
