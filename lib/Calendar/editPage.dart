@@ -329,7 +329,7 @@ void _showDeleteConfirmationDialog() {
                 ref.read(titleProvider.notifier).state = value;
               },
               decoration: InputDecoration(
-                labelText: ('タイトルを入力してください'),
+                hintText: ('タイトルを入力してください'),
               ),
             ),
             SwitchListTile(
@@ -392,7 +392,7 @@ void _showDeleteConfirmationDialog() {
               keyboardType: TextInputType.multiline,
               maxLines: 6,
               decoration: InputDecoration(
-                labelText: 'コメントを入力してください',
+                hintText:  'コメントを入力してください',
                 border: const OutlineInputBorder(),
               ),
             ),
