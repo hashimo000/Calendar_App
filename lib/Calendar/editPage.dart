@@ -243,7 +243,7 @@ void _showDeleteConfirmationDialog() {
     }
     return Scaffold(
       appBar: AppBar(
-        title: const Text('予定の編集'),
+        title:Center(child:const Text('予定の編集' ,style: TextStyle(color: Colors.white), )), 
         backgroundColor: Colors.blueAccent,
         leading: IconButton(
           icon: const Icon(Icons.close), 
