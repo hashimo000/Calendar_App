@@ -262,7 +262,8 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
             TextField(
               controller: _titleController,
               decoration: InputDecoration(
-                labelText: ('タイトルを入力してください'),
+                hintText:  'タイトルを入力してください',
+                border: const OutlineInputBorder(),
               ),
             ),
             SwitchListTile(
@@ -322,7 +323,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
               keyboardType: TextInputType.multiline,
               maxLines: 6,
               decoration: InputDecoration(
-                labelText: 'コメントを入力してください',
+                hintText: 'コメントを入力してください',
                 border: const OutlineInputBorder(),
               ),
             ),
