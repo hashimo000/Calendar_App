@@ -252,8 +252,14 @@ BoxDecoration? boxDecoration;
       margin: EdgeInsets.symmetric(horizontal: 8), // 左右のマージン
     ),
     Expanded(
-      child: Text(event.title, style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold)),
-    ),
+  child: Text(
+    event.title.length > 8 ? event.title.substring(0, 8) + '...' : event.title,
+    style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+    maxLines: 1,
+    overflow: TextOverflow.ellipsis,  // これにより、文字列がコンテナを超えた場合に末尾が省略されます。
+  ),
+),
+
   ],
 ),
         onTap: () { 
