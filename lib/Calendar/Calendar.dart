@@ -326,7 +326,7 @@ BoxDecoration? boxDecoration;
         width: 400,
         height: 500,
         child:  Center(
-          child: Text('予定はありません。'),
+          child: Text('予定がありません。'),
         )
         )
         );
