@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/widgets.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:intl/intl.dart';
 import 'package:flutter/cupertino.dart';
@@ -172,7 +173,9 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('予定の追加'),
+        title: Center(
+          child:Text('予定の追加', style: TextStyle(color: Colors.white))
+          ) ,
         backgroundColor: Colors.blueAccent,
         leading: IconButton(
           icon: const Icon(Icons.close), 
