@@ -178,7 +178,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
           ) ,
         backgroundColor: Colors.blueAccent,
         leading: IconButton(
-          icon: const Icon(Icons.close), 
+          icon: const Icon(Icons.close,color: Colors.white), 
           onPressed: () {
             Navigator.pop(context); 
           },
