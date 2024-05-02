@@ -246,7 +246,7 @@ void _showDeleteConfirmationDialog() {
         title:Center(child:const Text('予定の編集' ,style: TextStyle(color: Colors.white), )), 
         backgroundColor: Colors.blueAccent,
         leading: IconButton(
-          icon: const Icon(Icons.close), 
+          icon: const Icon(Icons.close,color: Colors.white), 
            onPressed: () {
             if (_isEdited(ref)) {
               _showActionSheet();
