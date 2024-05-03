@@ -311,6 +311,7 @@ void _showDeleteConfirmationDialog() {
         return Colors.black; // デフォルトのテキストカラー
       },
     ),
+     padding: MaterialStateProperty.all(EdgeInsets.symmetric(vertical: 16.0)), 
     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
       RoundedRectangleBorder(
         borderRadius: BorderRadius.circular(16),
