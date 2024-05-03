@@ -338,6 +338,10 @@ void _showDeleteConfirmationDialog() {
               onChanged: (bool value) {
                 ref.read(allDayEventProvider.notifier).state = value;
               },
+               activeColor: Color.fromRGBO(50, 124, 215, 1), // オンの状態の色
+               inactiveTrackColor: Colors.grey, // オフの状態のトラック色
+               activeTrackColor: Color.fromARGB(255, 106, 187, 245), // オンの状態のトラック色
+               inactiveThumbColor: Colors.white, // オフの状態のサム色
             ),
             ListTile(
   title: Row(
