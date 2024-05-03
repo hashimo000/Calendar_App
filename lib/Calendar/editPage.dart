@@ -21,6 +21,7 @@ class _EditPageState extends ConsumerState<EditPage> {
   bool _isInitialized = false;
   final TextEditingController _titleController = TextEditingController();
   final TextEditingController _commentsController = TextEditingController();
+   final FocusNode _titleFocusNode = FocusNode(); // FocusNodeを追加
   late String _initialTitle;
   late String _initialComments;
   late DateTime _initialStartDateTime;
@@ -52,7 +53,8 @@ class _EditPageState extends ConsumerState<EditPage> {
         _event = event;
         _isInitialized = true;
       });
-
+      // 初期化が完了した後にフォーカスを設定
+        _titleFocusNode.requestFocus();
       // 初期データでプロバイダーも更新
       ref.read(dateTimeStartProvider.notifier).state = _initialStartDateTime;
       ref.read(dateTimeEndProvider.notifier).state = _initialEndDateTime;
@@ -71,6 +73,7 @@ void dispose() {
   _commentsController.removeListener(_onTextChanged);
   _titleController.dispose();
   _commentsController.dispose();
+  _titleFocusNode.dispose(); // FocusNodeを破棄
   super.dispose();
 }
 bool _isEdited(WidgetRef ref) {
@@ -334,10 +337,11 @@ void _showDeleteConfirmationDialog() {
                 // テキストが変更されたらStateProviderの状態を更新
                 ref.read(titleProvider.notifier).state = value;
               },
-              
+                focusNode: _titleFocusNode, // FocusNodeをTextFieldに適用
               decoration: InputDecoration(
                 hintText: ('タイトルを入力してください'),
                 border: const OutlineInputBorder(),
+                
               ),
             ),
             SwitchListTile(
