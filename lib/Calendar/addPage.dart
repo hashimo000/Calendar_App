@@ -43,19 +43,23 @@ class AddPage extends ConsumerStatefulWidget {
   _AddPageState createState() => _AddPageState();
 }
 class _AddPageState extends ConsumerState<AddPage> {
+   final TextEditingController _titleController = TextEditingController();
+  final TextEditingController _commentsController = TextEditingController();
+  final FocusNode _titleFocusNode = FocusNode(); // フォーカスノードの作成
   @override
   void initState() {
     super.initState();
     _titleController.addListener(_updateButtonState);
   _commentsController.addListener(_updateButtonState);
     WidgetsBinding.instance.addPostFrameCallback((_) => resetFormState());
+     _titleFocusNode.requestFocus(); // フォーカスを設定
   }
  @override
   void dispose() {
     // ウィジェットが破棄される前にリスナーを削除
     _titleController.removeListener(_updateButtonState);
     _commentsController.removeListener(_updateButtonState);
-
+_titleFocusNode.dispose(); // フォーカスノードの破棄
     // 破棄プロセスを完了するために、スーパーメソッドを呼び出すことを忘れないでください
     super.dispose();
   }
@@ -267,6 +271,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
         child: ListView(
           children: <Widget>[
             TextField(
+                 focusNode: _titleFocusNode, // フォーカスノードをTextFieldに適用
               controller: _titleController,
               decoration: InputDecoration(
                 hintText:  'タイトルを入力してください',
