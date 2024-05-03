@@ -298,9 +298,17 @@ void _showDeleteConfirmationDialog() {
     backgroundColor: MaterialStateProperty.resolveWith<Color>(
       (Set<MaterialState> states) {
         if (states.contains(MaterialState.disabled)) {
-          return Colors.grey; // ボタン非活性時の背景色
+           return Color.fromARGB(255, 216, 216, 216); // ボタン非活性時の背景色
         }
         return Colors.white; // デフォルトの背景色
+      },
+    ),
+       foregroundColor: MaterialStateProperty.resolveWith<Color>(
+      (Set<MaterialState> states) {
+        if (states.contains(MaterialState.disabled)) {
+          return Color.fromARGB(255, 155, 155, 155); // 無効時のテキストカラー
+        }
+        return Colors.black; // デフォルトのテキストカラー
       },
     ),
     shape: MaterialStateProperty.all<RoundedRectangleBorder>(
@@ -311,9 +319,6 @@ void _showDeleteConfirmationDialog() {
   ),
             child: const 
             Text('保存',
-              style: TextStyle(
-                color: Colors.black, 
-              ),
             ),
           ),
         ],
