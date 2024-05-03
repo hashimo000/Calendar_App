@@ -334,8 +334,10 @@ void _showDeleteConfirmationDialog() {
                 // テキストが変更されたらStateProviderの状態を更新
                 ref.read(titleProvider.notifier).state = value;
               },
+              
               decoration: InputDecoration(
                 hintText: ('タイトルを入力してください'),
+                border: const OutlineInputBorder(),
               ),
             ),
             SwitchListTile(
