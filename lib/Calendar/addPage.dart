@@ -84,16 +84,35 @@ _titleFocusNode.dispose(); // フォーカスノードの破棄
     ref.read(dateTimeEndProvider.notifier).state = DateTime.now().add(Duration(hours: 1));
   }
 
-
 void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
   showCupertinoModalPopup(
     context: context,
     builder: (_) => Container(
-      height: 250,
+      height: 300,  // コンテナの高さを250から300に調整して、ボタンのスペースを確保
       color: Colors.white,
       child: Column(
         children: [
+          // ボタン行を追加
+          Container(
+            height: 50,  // ボタンのためのスペース
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CupertinoButton(
+                  child: Text('キャンセル'),
+                  onPressed: () => Navigator.pop(context),  // キャンセルボタンの動作
+                ),
+                CupertinoButton(
+                  child: Text('完了'),
+                  onPressed: () {
+                    Navigator.pop(context);  // 完了ボタンを押した時の動作
+                  },
+                ),
+              ],
+            ),
+          ),
+          // DatePickerを含むコンテナ
           Container(
             height: 200,
             child: CupertinoDatePicker(
@@ -119,6 +138,7 @@ void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
     ),
   );
 }
+
 
 void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
