@@ -83,50 +83,61 @@ _titleFocusNode.dispose(); // フォーカスノードの破棄
     ref.read(dateTimeStartProvider.notifier).state = DateTime.now();
     ref.read(dateTimeEndProvider.notifier).state = DateTime.now().add(Duration(hours: 1));
   }
+DateTime roundToNearestMinute(DateTime dateTime, int minuteInterval) {
+  int excessMinutes = dateTime.minute % minuteInterval;
+  int roundedMinutes = excessMinutes < minuteInterval / 2 
+      ? dateTime.minute - excessMinutes 
+      : dateTime.minute + minuteInterval - excessMinutes;
 
-void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
+  // 分が60になった場合は時間を調整する
+  if (roundedMinutes == 60) {
+    return DateTime(dateTime.year, dateTime.month, dateTime.day, dateTime.hour + 1, 0);
+  } else {
+    return DateTime(dateTime.year, dateTime.month, dateTime.day, dateTime.hour, roundedMinutes);
+  }
+}void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
+  DateTime initialDateTime = ref.read(dateTimeStartProvider); // 現在の開始時間を取得
+  initialDateTime = roundToNearestMinute(initialDateTime, 15); // 分を15分間隔に丸める
+
+  DateTime tempDateTime = initialDateTime; // 一時的な開始日時
+
   showCupertinoModalPopup(
     context: context,
     builder: (_) => Container(
-      height: 300,  // コンテナの高さを250から300に調整して、ボタンのスペースを確保
+      height: 300,
       color: Colors.white,
       child: Column(
         children: [
-          // ボタン行を追加
           Container(
-            height: 50,  // ボタンのためのスペース
+            height: 50,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CupertinoButton(
                   child: Text('キャンセル'),
-                  onPressed: () => Navigator.pop(context),  // キャンセルボタンの動作
+                  onPressed: () => Navigator.pop(context),
                 ),
                 CupertinoButton(
                   child: Text('完了'),
                   onPressed: () {
-                    Navigator.pop(context);  // 完了ボタンを押した時の動作
+                    // 完了時に開始時間を更新し、終了時間も開始時間の1時間後に設定
+                    ref.read(dateTimeStartProvider.notifier).state = tempDateTime;
+                    ref.read(dateTimeEndProvider.notifier).state = tempDateTime.add(Duration(hours: 1));
+                    Navigator.pop(context);
                   },
                 ),
               ],
             ),
           ),
-          // DatePickerを含むコンテナ
           Container(
             height: 200,
             child: CupertinoDatePicker(
-              initialDateTime: DateTime(now.year, now.month, now.day),
+              initialDateTime: tempDateTime,
               mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
               onDateTimeChanged: (DateTime newDate) {
-                // 選択された新しい開始時間を現在の終了時間と比較
-                final currentEnd = ref.read(dateTimeEndProvider);
-                if (newDate.isAfter(currentEnd)) {
-                  // 開始時間が終了時間よりも後の場合は、終了時間を開始時間+1時間に設定
-                  final newEnd = newDate.add(Duration(hours: 1));
-                  ref.read(dateTimeEndProvider.notifier).state = newEnd;
-                }
-                ref.read(dateTimeStartProvider.notifier).state = newDate;
+                tempDateTime = newDate; // 一時的な開始日時を更新
+                // ここではまだ終了時間を更新しない
               },
               minimumDate: DateTime(2022, 5, 5),
               maximumDate: DateTime(2030, 6, 7),
@@ -144,39 +155,47 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
   final currentStart = ref.read(dateTimeStartProvider);
 
-  // 現在の開始時刻から1時間後の時刻を計算
-  final oneHourLater = currentStart.add(Duration(hours: 1));
+  DateTime initialDateTime = currentStart.add(Duration(hours: 1));
+  initialDateTime = roundToNearestMinute(initialDateTime, 15); // 分を15分間隔に丸める
 
-  // 分を15で割り、結果を切り上げてから15を掛けて、15分単位に丸める
-  final roundedMinutes = (oneHourLater.minute / 15).ceil() * 15;
-  DateTime roundedOneHourLater;
-
-  // 分が60以上の場合は、時間を1つ進めて分を0にする
-  if (roundedMinutes >= 60) {
-    roundedOneHourLater = DateTime(oneHourLater.year, oneHourLater.month, oneHourLater.day, oneHourLater.hour + 1, 0);
-  } else {
-    roundedOneHourLater = DateTime(oneHourLater.year, oneHourLater.month, oneHourLater.day, oneHourLater.hour, roundedMinutes);
-  }
-
-  // 開始時間より後の時刻かどうかを判定し、条件に応じて初期値と最小日時を設定
-  final initialAndMinimumDateTime = roundedOneHourLater.isAfter(currentStart) ? roundedOneHourLater : currentStart.add(Duration(hours: 1));
+  DateTime tempDateTime = initialDateTime; // 一時的な日時
 
   showCupertinoModalPopup(
     context: context,
     builder: (_) => Container(
-      height: 250,
+      height: 300,
       color: Colors.white,
       child: Column(
         children: [
           Container(
+            height: 50,
+            child: Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
+              children: [
+                CupertinoButton(
+                  child: Text('キャンセル'),
+                  onPressed: () => Navigator.pop(context),
+                ),
+                CupertinoButton(
+                  child: Text('完了'),
+                  onPressed: () {
+                    // 完了時に一時的な値を状態に反映
+                    ref.read(dateTimeEndProvider.notifier).state = tempDateTime;
+                    Navigator.pop(context);
+                  },
+                ),
+              ],
+            ),
+          ),
+          Container(
             height: 200,
             child: CupertinoDatePicker(
-              initialDateTime: initialAndMinimumDateTime,
+              initialDateTime: tempDateTime,
               mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
               onDateTimeChanged: (DateTime newDate) {
-                ref.read(dateTimeEndProvider.notifier).state = newDate;
+                tempDateTime = newDate; // 一時的な状態を更新
               },
-              minimumDate: initialAndMinimumDateTime,
+              minimumDate: currentStart.add(Duration(minutes: 15)), // 開始時刻の15分後を最小値とする
               maximumDate: DateTime(2030, 6, 7),
               minuteInterval: 15,
             ),
