@@ -110,16 +110,16 @@ DateTime roundToNearestMinute(DateTime dateTime, int minuteInterval) {
       child: Column(
         children: [
           Container(
-            height: 50,
+            
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CupertinoButton(
-                  child: Text('キャンセル'),
+                  child: Text('キャンセル',style: TextStyle(color: Colors.blue)),
                   onPressed: () => Navigator.pop(context),
                 ),
                 CupertinoButton(
-                  child: Text('完了'),
+                  child: Text('完了',style: TextStyle(color: Colors.blue)),
                   onPressed: () {
                     // 完了時に開始時間を更新し、終了時間も開始時間の1時間後に設定
                     ref.read(dateTimeStartProvider.notifier).state = tempDateTime;
@@ -168,16 +168,15 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
       child: Column(
         children: [
           Container(
-            height: 50,
             child: Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 CupertinoButton(
-                  child: Text('キャンセル'),
+                  child: Text('キャンセル',style: TextStyle(color: Colors.blue)),
                   onPressed: () => Navigator.pop(context),
                 ),
                 CupertinoButton(
-                  child: Text('完了'),
+                  child: Text('完了',style: TextStyle(color: Colors.blue)),
                   onPressed: () {
                     // 完了時に一時的な値を状態に反映
                     ref.read(dateTimeEndProvider.notifier).state = tempDateTime;
