@@ -341,7 +341,12 @@ void _showDeleteConfirmationDialog() {
         ),
       );
     }
-    return Scaffold(
+    return  GestureDetector(
+    onTap: () {
+      // 画面のどこかをタップしたときにキーボードを非表示にする
+      FocusScope.of(context).unfocus();
+    },
+     child: Scaffold(
       appBar: AppBar(
         title:Center(child:const Text('予定の編集' ,style: TextStyle(color: Colors.white), )), 
         backgroundColor: Colors.blueAccent,
@@ -516,6 +521,7 @@ void _showDeleteConfirmationDialog() {
           ],
         ),
       ),
+    )
     );
   }
 }
