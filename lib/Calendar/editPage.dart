@@ -291,22 +291,34 @@ void _showDeleteConfirmationDialog() {
     context: context,
     builder: (BuildContext context) {
       return AlertDialog(
-        title: Text('予定の削除'),
-        content: Text('本当にこの日の予定を削除しますか？'),
+        title: Text(
+          '予定の削除', 
+          textAlign: TextAlign.center, 
+          style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold)
+        ),
+        content: Text('本当にこの日の予定を削除しますか？', style: TextStyle(fontSize: 16)),
+        actionsAlignment: MainAxisAlignment.spaceEvenly,  // アクションボタンを均等に配置
         actions: <Widget>[
           TextButton(
             onPressed: () {
-              Navigator.of(context).pop(); 
+              Navigator.of(context).pop();  // ダイアログを閉じる
             },
-            child: Text('キャンセル'),
+            style: TextButton.styleFrom(
+
+              textStyle: TextStyle(fontSize: 16),
+            ),
+            child: Text('キャンセル', style: TextStyle(color: Colors.blue)),
           ),
           TextButton(
             onPressed: () {
-              _deleteEvent();
-              Navigator.of(context).pop();
-              Navigator.of(context).pop();
+              _deleteEvent();  // イベント削除の処理
+              Navigator.of(context).pop();  // ダイアログを閉じる
+              Navigator.of(context).pop();  // 前の画面に戻る
             },
-            child: Text('削除'),
+            style: TextButton.styleFrom(
+              textStyle: TextStyle(fontSize: 16),
+            ),
+            child: Text('削除', style: TextStyle(color: Colors.blue)),
           ),
         ],
       );
@@ -499,7 +511,7 @@ void _showDeleteConfirmationDialog() {
             ),
             TextButton(
               onPressed: _showDeleteConfirmationDialog, 
-              child: Text('この予定を削除'),
+              child: Text('この予定を削除', style: TextStyle(color: Colors.red)),
             ),
           ],
         ),
