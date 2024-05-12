@@ -213,7 +213,14 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
     final isAllDay = ref.watch(allDayEventProvider);
     final dateFormat = isAllDay ? 'yyyy-MM-dd' : 'yyyy-MM-dd kk:mm';
 
-    return Scaffold(
+    return 
+    GestureDetector(
+    onTap: () {
+      // 画面のどこかをタップしたときにキーボードを非表示にする
+      FocusScope.of(context).unfocus();
+    },
+    child: 
+    Scaffold(
       appBar: AppBar(
         title: Center(
           child:Text('予定の追加', style: TextStyle(color: Colors.white))
@@ -384,6 +391,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
           ],
         ),
       ),
+    )
     );
   }
 }
