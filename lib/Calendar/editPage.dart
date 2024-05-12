@@ -129,6 +129,7 @@ void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
 
   int adjustment = (15 - initialDateTime.minute % 15) % 15;
   DateTime adjustedInitialDateTime = initialDateTime.add(Duration(minutes: adjustment));
+  DateTime tempNewDate = initialDateTime;  // 一時的な日時を保持する変数
 
   showModalBottomSheet(
     context: context,
@@ -142,11 +143,21 @@ void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
             children: [
               CupertinoButton(
                 child: Text('キャンセル', style: TextStyle(color: Colors.blue)),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  // キャンセル時は何もしない
+                  Navigator.pop(context);
+                },
               ),
               CupertinoButton(
                 child: Text('完了', style: TextStyle(color: Colors.blue)),
                 onPressed: () {
+                  // 完了時に一時的な変数から実際のプロバイダーを更新
+                  ref.read(dateTimeStartProvider.notifier).state = tempNewDate;
+                  // 終了時間が必要な場合も更新
+                  DateTime currentEndDateTime = ref.read(dateTimeEndProvider);
+                  if (currentEndDateTime.isBefore(tempNewDate.add(Duration(hours: 1)))) {
+                    ref.read(dateTimeEndProvider.notifier).state = tempNewDate.add(Duration(hours: 1));
+                  }
                   Navigator.pop(context);
                 },
               ),
@@ -157,13 +168,8 @@ void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
               initialDateTime: adjustedInitialDateTime,
               mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
               onDateTimeChanged: (DateTime newDate) {
-                // 開始時間が更新されたとき、終了時間もチェックし更新
-                DateTime currentEndDateTime = ref.read(dateTimeEndProvider);
-                if (currentEndDateTime.isBefore(newDate.add(Duration(hours: 1)))) {
-                  // 終了時間を開始時間の1時間後に設定
-                  ref.read(dateTimeEndProvider.notifier).state = newDate.add(Duration(hours: 1));
-                }
-                ref.read(dateTimeStartProvider.notifier).state = newDate;
+                // DatePickerからの新しい日時を一時的な変数に保存
+                tempNewDate = newDate;
               },
               minimumDate: null,
               minuteInterval: 15,
@@ -177,12 +183,14 @@ void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
 
 void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
-  final currentStartDateTime = ref.read(dateTimeStartProvider);
-  DateTime oneHourAfterStart = currentStartDateTime.add(Duration(hours: 1));  // 開始時間から1時間後
+  final currentEndDateTime = ref.read(dateTimeEndProvider);  // 現在の終了時間を取得
+  DateTime initialDateTime = currentEndDateTime;
 
-  int minutes = oneHourAfterStart.minute;
+  int minutes = initialDateTime.minute;
   int adjustment = (15 - minutes % 15) % 15;
-  DateTime adjustedDateTime = oneHourAfterStart.add(Duration(minutes: adjustment));
+  DateTime adjustedDateTime = initialDateTime.add(Duration(minutes: adjustment));  // 初期値を15分単位に調整
+
+  DateTime tempNewDate = adjustedDateTime;  // 一時的な新しい終了日時を保持する変数
 
   showModalBottomSheet(
     context: context,
@@ -196,11 +204,16 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
             children: [
               CupertinoButton(
                 child: Text('キャンセル', style: TextStyle(color: Colors.blue)),
-                onPressed: () => Navigator.pop(context),
+                onPressed: () {
+                  // キャンセル時は何もしない
+                  Navigator.pop(context);
+                },
               ),
               CupertinoButton(
                 child: Text('完了', style: TextStyle(color: Colors.blue)),
                 onPressed: () {
+                  // 完了時に一時的な変数から実際のプロバイダーを更新
+                  ref.read(dateTimeEndProvider.notifier).state = tempNewDate;
                   Navigator.pop(context);
                 },
               ),
@@ -208,12 +221,13 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
           ),
           Expanded(
             child: CupertinoDatePicker(
-              initialDateTime: adjustedDateTime,
+              initialDateTime: adjustedDateTime,  // 調整済みの初期値を使用
               mode: isAllDay ? CupertinoDatePickerMode.date : CupertinoDatePickerMode.dateAndTime,
               onDateTimeChanged: (DateTime newDate) {
-                ref.read(dateTimeEndProvider.notifier).state = newDate;
+                // DatePickerからの新しい日時を一時的な変数に保存
+                tempNewDate = newDate;
               },
-              minimumDate: adjustedDateTime,  // 終了時間の最小値を設定
+              minimumDate: ref.read(dateTimeStartProvider).add(Duration(hours: 1)),  // 終了時間の最小値を開始時間の1時間後に設定
               minuteInterval: 15,
             ),
           ),
