@@ -130,6 +130,7 @@ void _showActionSheet() {
                 ref.read(allDayEventProvider.notifier).state = _initialIsAllDay;
 
                 Navigator.pop(context);
+                Navigator.pop(context);
               }),
               SizedBox(height: 20),  // 項目間のスペース
               _buildActionItem('キャンセル', onTap: () {
