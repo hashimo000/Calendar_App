@@ -89,40 +89,75 @@ bool _isEdited(WidgetRef ref) {
          currentEndDateTime != _initialEndDateTime ||
          currentIsAllDay != _initialIsAllDay;
 }
-
 void _showActionSheet() {
-    showModalBottomSheet(
-      context: context,
-      builder: (BuildContext context) {
-        return SafeArea(
-          child: Wrap(
-            children: <Widget>[
-              ListTile(
-                  leading: Icon(Icons.delete),
-                  title: Text('編集を破棄'),
-                  onTap: () {
-                    _titleController.text = _initialTitle;
-                    _commentsController.text = _initialComments;
-                    ref.read(dateTimeStartProvider.notifier).state = _initialStartDateTime;
-                    ref.read(dateTimeEndProvider.notifier).state = _initialEndDateTime;
-                    ref.read(allDayEventProvider.notifier).state = _initialIsAllDay;
-
-                    Navigator.pop(context); 
-                    Navigator.pop(context); 
-                  }),
-              ListTile(
-                leading: Icon(Icons.cancel),
-                title: Text('キャンセル'),
-                onTap: () {
-                  Navigator.pop(context); 
-                },
+  showModalBottomSheet(
+    context: context,
+    isScrollControlled: true,
+    backgroundColor: Colors.transparent,  // 背景を透明に設定
+    builder: (BuildContext context) {
+      return Container(
+        margin: EdgeInsets.all(20),  // 余白を設定
+        decoration: BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.circular(20),  // 角の丸みを設定
+          boxShadow: [
+            BoxShadow(
+              color: Colors.black26,
+              blurRadius: 10,
+              offset: Offset(0, 4),
+            ),
+          ],
+        ),
+        child: Padding(
+          padding: const EdgeInsets.symmetric(vertical: 20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Container(
+                width: 40,
+                height: 4,
+                decoration: BoxDecoration(
+                  color: Colors.grey[300],
+                  borderRadius: BorderRadius.circular(10),
+                ),
+                margin: const EdgeInsets.only(bottom: 20),
               ),
+              _buildActionItem('編集を破棄', onTap: () {
+                _titleController.text = _initialTitle;
+                _commentsController.text = _initialComments;
+                ref.read(dateTimeStartProvider.notifier).state = _initialStartDateTime;
+                ref.read(dateTimeEndProvider.notifier).state = _initialEndDateTime;
+                ref.read(allDayEventProvider.notifier).state = _initialIsAllDay;
+
+                Navigator.pop(context);
+              }),
+              SizedBox(height: 20),  // 項目間のスペース
+              _buildActionItem('キャンセル', onTap: () {
+                Navigator.pop(context);
+              }),
             ],
           ),
-        );
-      },
-    );
-  }
+        ),
+      );
+    },
+  );
+}
+
+Widget _buildActionItem(String text, {required VoidCallback onTap}) {
+  return InkWell(
+    onTap: onTap,
+    child: Container(
+      width: double.infinity,
+      padding: EdgeInsets.symmetric(vertical: 15),
+      child: Text(
+        text,
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 18, color: Colors.blueAccent),
+      ),
+    ),
+  );
+}
+
 void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
   final isAllDay = ref.watch(allDayEventProvider);
   DateTime initialDateTime = ref.read(dateTimeStartProvider);
