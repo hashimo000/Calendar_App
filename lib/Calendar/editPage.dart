@@ -397,7 +397,6 @@ void _showDeleteConfirmationDialog() {
               });
 
               Navigator.pop(context);
-               Navigator.pop(context);
             }: null, // isEditedがfalseの場合、ボタンは非活性化される。
             style:  ButtonStyle(
     backgroundColor: MaterialStateProperty.resolveWith<Color>(
