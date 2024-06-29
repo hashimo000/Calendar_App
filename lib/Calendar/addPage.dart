@@ -274,7 +274,8 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
     ref.read(eventCommentsProvider.notifier).state = enteredComments; // TextFieldから入力されたコメント;
     ref.read(eventDateTimeStartProvider.notifier).state = startDateTime; // DateTimePickerから選択された日時;
     ref.read(eventDateTimeEndProvider.notifier).state = endDateTime;
-    
+     // リアルタイムで更新するためにイベントリストプロバイダーを無効化して更新
+      ref.invalidate(eventListProvider);
     Navigator.pop(context, true); 
             }
          :null ,
