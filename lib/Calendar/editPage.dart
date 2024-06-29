@@ -194,7 +194,7 @@ void _showDateTimePickerStart(BuildContext context, WidgetRef ref) {
                       ref.read(dateTimeEndProvider.notifier).state = tempNewDate.add(Duration(hours: 1));
                     }
                   });
-                  Navigator.pop(context);
+                  Navigator.pop(context, true);
                 },
               ),
             ],
