@@ -275,8 +275,7 @@ void _showDateTimePickerEnd(BuildContext context, WidgetRef ref) {
     ref.read(eventDateTimeStartProvider.notifier).state = startDateTime; // DateTimePickerから選択された日時;
     ref.read(eventDateTimeEndProvider.notifier).state = endDateTime;
     
-    Navigator.pop(context); 
-     Navigator.pop(context);
+    Navigator.pop(context, true); 
             }
          :null ,
             
