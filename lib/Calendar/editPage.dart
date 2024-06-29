@@ -395,8 +395,8 @@ void _showDeleteConfirmationDialog() {
                   return event;
                 }).toList();
               });
-
-              Navigator.pop(context);
+              ref.invalidate(eventListProvider); // 変更した行
+   Navigator.pop(context, true); // 変更を伝えるためにtrueを返す
             }: null, // isEditedがfalseの場合、ボタンは非活性化される。
             style:  ButtonStyle(
     backgroundColor: MaterialStateProperty.resolveWith<Color>(
