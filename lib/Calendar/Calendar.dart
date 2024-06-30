@@ -600,7 +600,7 @@ BoxDecoration? boxDecoration;
                 onPressed: (){
                   goToToday(); 
                 },
-              child: Text('今日', style: TextStyle(fontSize: 20, color: Colors.black))
+              child: Text('今日', style: TextStyle(color: Colors.black))
               ),
                Spacer(), //余白を追加
               GestureDetector(
