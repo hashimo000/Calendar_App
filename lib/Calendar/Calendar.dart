@@ -72,190 +72,189 @@ Future<List<DateTime>> fetchEventsDates(WidgetRef ref) async {
 }
 
 class CalendarPage extends ConsumerWidget {
-  // カレンダー画面でのダイアログ表示用関数
-  void _showEventDialog(BuildContext context, WidgetRef ref, DateTime date, String weekDayName) {
+void _showEventDialog(BuildContext context, WidgetRef ref, DateTime initialDate) {
+  
+final pagecontroller = PageController(
+      initialPage: 100,
+      // 隣同士のダイアログの端をどれくらい画面に表示するかの割合
+      viewportFraction: 0.8,
+    );
     showDialog(
       context: context,
       builder: (BuildContext context) {
-        return FutureBuilder<List<Event>>(
-          future: _fetchEvents(ref, date), // データベースからイベントデータを取得
-          builder: (context, snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              return CircularProgressIndicator();
-            } else if (snapshot.hasError) {
-              return Text('エラーが発生しました');
-            } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
-              final events = snapshot.data!;
-              return AlertDialog(
-                backgroundColor: Colors.white,
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    RichText(
-                      text: TextSpan(
-                        style: TextStyle(fontSize: 20, color: Colors.black), // デフォルトのスタイル
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: DateFormat('yyyy/MM/dd').format(date) + '(', // 日付部分
-                          ),
-                          TextSpan(
-                            text: '${weekDayName}', // 曜日名部分
-                            style: TextStyle(
-                              color: date.weekday == DateTime.sunday
-                                  ? Colors.red  // 日曜日は赤色
-                                  : date.weekday == DateTime.saturday
-                                  ? Colors.blue  // 土曜日は青色
-                                  : Colors.black, // それ以外の曜日はデフォルトカラーを使用
-                            ),
-                          ),
-                          TextSpan(
-                            text: ')', // 日付部分
-                          ),
-                        ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.add),
-                      color: Colors.blue,
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => AddPage()),
-                        ).then((value) {
-                          if (value == true) {
-                            ref.invalidate(eventListProvider); // 変更した行
-                            Navigator.of(context).pop();
-                            _showEventDialog(context, ref, date, weekDayName); // 再度ダイアログを表示
-                          }
-                        });
-                      }
-                    )
-                  ],
-                ),
-                content: Container(
-                  width: 400,
-                  height: 500,
-                  child: ListView.builder(
-                    itemCount: events.length,
-                    itemBuilder: (context, index) {
-                      final event = events[index];
-                      return Card(
-                        margin: EdgeInsets.all(8), // カードの周りのマージンを設定
-                        child: ListTile(
-                          title: Row(
-                            crossAxisAlignment: CrossAxisAlignment.center, // 中央揃えにする
-                            children: <Widget>[
-                              event.isAllDay
-                                  ? Text("終日", style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold))
-                                  : Column(
-                                mainAxisAlignment: MainAxisAlignment.center,
-                                children: <Widget>[
-                                  Text(DateFormat("HH:mm").format(event.startDateTime)),
-                                  Text(DateFormat("HH:mm").format(event.endDateTime)),
-                                ],
-                              ),
-                              Container(
-                                height: 24, // 線の高さ
-                                width: 2, // 線の幅
-                                color: Colors.blue, // 線の色
-                                margin: EdgeInsets.symmetric(horizontal: 8), // 左右のマージン
-                              ),
-                              Expanded(
-                                child: Text(
-                                  event.title.length > 8 ? event.title.substring(0, 8) + '...' : event.title,
-                                  style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
-                                  maxLines: 1,
-                                  overflow: TextOverflow.ellipsis,  // これにより、文字列がコンテナを超えた場合に末尾が省略されます。
+        return AlertDialog(
+          backgroundColor: Colors.white,
+          content: Container(
+            width: 400,
+            height: 500,
+            child: PageView.builder(
+              controller: pagecontroller,
+              itemBuilder: (context, pageIndex) {
+                DateTime date = initialDate.add(Duration(days: pageIndex - 1));
+                String weekDayName = ['月', '火', '水', '木', '金', '土', '日'][date.weekday - 1];
+                return FutureBuilder<List<Event>>(
+                  future: _fetchEvents(ref, date),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(child: CircularProgressIndicator());
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('エラーが発生しました'));
+                    } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+                      final events = snapshot.data!;
+                      return Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  style: TextStyle(fontSize: 20, color: Colors.black),
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text: DateFormat('yyyy/MM/dd').format(date) + '(', 
+                                    ),
+                                    TextSpan(
+                                      text: weekDayName,
+                                      style: TextStyle(
+                                        color: date.weekday == DateTime.sunday ? Colors.red 
+                                              : date.weekday == DateTime.saturday ? Colors.blue 
+                                              : Colors.black,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: ')', 
+                                    ),
+                                  ],
                                 ),
                               ),
+                              IconButton(
+                                icon: Icon(Icons.add),
+                                color: Colors.blue,
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(builder: (context) => AddPage()),
+                                  ).then((value) {
+                                    if (value == true) {
+                                      ref.invalidate(eventListProvider);
+                                      Navigator.of(context).pop();
+                                      _showEventDialog(context, ref, date); 
+                                    }
+                                  });
+                                }
+                              )
                             ],
                           ),
-                          onTap: () {
-                            debugPrint(event.id.toString());
-                            debugPrint(event.title);
-                            debugPrint(event.startDateTime.toString());
-                            debugPrint(event.endDateTime.toString());
-                            debugPrint(event.comments);
-                            debugPrint(event.isAllDay.toString());
-                            Navigator.of(context).push(MaterialPageRoute(
-                              builder: (context) => EditPage(eventId: event.id),
-                            )).then((value) {
-                              if (value == true) {
-                                ref.invalidate(eventListProvider); // 変更した行
-                                Navigator.of(context).pop();
-                                _showEventDialog(context, ref, date, weekDayName); // 再度ダイアログを表示
-                              }
-                            });
-                          },
-                        ),
-                      );
-                    },
-                  ),
-                ),
-                actions: <Widget>[
-                  TextButton(
-                    child: Text('閉じる'),
-                    onPressed: () {
-                      Navigator.of(context).pop();
-                    },
-                  ),
-                ],
-              );
-            } else {
-              return AlertDialog(
-                backgroundColor: Colors.white,
-                title: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
-                  children: [
-                    RichText(
-                      text: TextSpan(
-                        style: TextStyle(fontSize: 20, color: Colors.black), // デフォルトのスタイル
-                        children: <TextSpan>[
-                          TextSpan(
-                            text: DateFormat('yyyy/MM/dd').format(date) + '(', // 日付部分
-                          ),
-                          TextSpan(
-                            text: '${weekDayName}', // 曜日名部分
-                            style: TextStyle(
-                              color: date.weekday == DateTime.sunday
-                                  ? Colors.red  // 日曜日は赤色
-                                  : date.weekday == DateTime.saturday
-                                  ? Colors.blue  // 土曜日は青色
-                                  : Colors.black, // それ以外の曜日はデフォルトカラーを使用
+                          Expanded(
+                            child: ListView.builder(
+                              itemCount: events.length,
+                              itemBuilder: (context, index) {
+                                final event = events[index];
+                                return Card(
+                                  margin: EdgeInsets.all(8),
+                                  child: ListTile(
+                                    title: Row(
+                                      crossAxisAlignment: CrossAxisAlignment.center,
+                                      children: <Widget>[
+                                        event.isAllDay
+                                            ? Text("終日", style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold))
+                                            : Column(
+                                          mainAxisAlignment: MainAxisAlignment.center,
+                                          children: <Widget>[
+                                            Text(DateFormat("HH:mm").format(event.startDateTime)),
+                                            Text(DateFormat("HH:mm").format(event.endDateTime)),
+                                          ],
+                                        ),
+                                        Container(
+                                          height: 24,
+                                          width: 2,
+                                          color: Colors.blue,
+                                          margin: EdgeInsets.symmetric(horizontal: 8),
+                                        ),
+                                        Expanded(
+                                          child: Text(
+                                            event.title.length > 8 ? event.title.substring(0, 8) + '...' : event.title,
+                                            style: TextStyle(fontSize: 20, color: Colors.black, fontWeight: FontWeight.bold),
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                    onTap: () {
+                                      Navigator.of(context).push(MaterialPageRoute(
+                                        builder: (context) => EditPage(eventId: event.id),
+                                      )).then((value) {
+                                        if (value == true) {
+                                          ref.invalidate(eventListProvider);
+                                          Navigator.of(context).pop();
+                                          _showEventDialog(context, ref, date);
+                                        }
+                                      });
+                                    },
+                                  ),
+                                );
+                              },
                             ),
                           ),
-                          TextSpan(
-                            text: ')', // 日付部分
+                        ],
+                      );
+                    } else {
+                      return Column(
+                        children: [
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              RichText(
+                                text: TextSpan(
+                                  style: TextStyle(fontSize: 20, color: Colors.black),
+                                  children: <TextSpan>[
+                                    TextSpan(
+                                      text: DateFormat('yyyy/MM/dd').format(date) + '(', 
+                                    ),
+                                    TextSpan(
+                                      text: weekDayName,
+                                      style: TextStyle(
+                                        color: date.weekday == DateTime.sunday ? Colors.red 
+                                              : date.weekday == DateTime.saturday ? Colors.blue 
+                                              : Colors.black,
+                                      ),
+                                    ),
+                                    TextSpan(
+                                      text: ')', 
+                                    ),
+                                  ],
+                                ),
+                              ),
+                              IconButton(
+                                icon: Icon(Icons.add),
+                                color: Colors.blue,
+                                onPressed: () {
+                                  Navigator.of(context).push(
+                                    MaterialPageRoute(builder: (context) => AddPage()),
+                                  ).then((value) {
+                                    if (value == true) {
+                                      ref.invalidate(eventListProvider);
+                                      Navigator.of(context).pop();
+                                      _showEventDialog(context, ref, date); 
+                                    }
+                                  });
+                                }
+                              )
+                            ],
+                          ),
+                          Expanded(
+                            child: Center(
+                              child: Text('予定がありません。'),
+                            ),
                           ),
                         ],
-                      ),
-                    ),
-                    IconButton(
-                      icon: Icon(Icons.add),
-                      color: Colors.blue,
-                      onPressed: () {
-                        Navigator.of(context).push(
-                          MaterialPageRoute(builder: (context) => AddPage()),
-                        ).then((value) {
-                          if (value == true) {
-                            ref.invalidate(eventListProvider); // 変更した行
-                            Navigator.of(context).pop();
-                            _showEventDialog(context, ref, date, weekDayName); // 再度ダイアログを表示
-                          }
-                        });
-                      }
-                    )
-                  ],
-                ),
-                content: Container(
-                  width: 400,
-                  height: 500,
-                  child: Center(
-                    child: Text('予定がありません。'),
-                  ),
-                ),
-              );
-            }
-          },
+                      );
+                    }
+                  },
+                );
+              },
+            ),
+          ),
         );
       },
     );
@@ -463,7 +462,7 @@ BoxDecoration? boxDecoration;
                           if (value == true) {
                                    ref.invalidate(eventListProvider); // 変更した行
                                 Navigator.of(context).pop();
-                                _showEventDialog(context, ref, date, weekDayName); // 再度ダイアログを表示
+                                _showEventDialog(context, ref, date); // 再度ダイアログを表示
                               }
                         });
                       },
@@ -521,7 +520,7 @@ BoxDecoration? boxDecoration;
                       //リアルタイム表示重要
                                 ref.invalidate(eventListProvider); // 変更した行
                                 Navigator.of(context).pop();
-                                _showEventDialog(context, ref, date, weekDayName); // 再度ダイアログを表示
+                                _showEventDialog(context, ref, date); // 再度ダイアログを表示
                               }
                     });
                   }
@@ -601,7 +600,8 @@ BoxDecoration? boxDecoration;
                 onPressed: (){
                   goToToday(); 
                 },
-              child: Text('今日')),
+              child: Text('今日', style: TextStyle(fontSize: 20, color: Colors.black))
+              ),
                Spacer(), //余白を追加
               GestureDetector(
   onTap: () async {
